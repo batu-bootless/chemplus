@@ -1,0 +1,71 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}İyonik Kuvvet{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-atom"></i>{% endblock %}
+{% block header_title %}İyonik Kuvvet{% endblock %}
+{% block header_desc %}Çözelti için I = 0.5 Σ cᵢ zᵢ² hesabı{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">c₁ (mol/L)</label>
+            <input type="number" id="c1" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.0001" placeholder="Örn: 0.1">
+            <label class="block text-xs text-gray-500 mt-1">z₁</label>
+            <input type="number" id="z1" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="1" placeholder="Örn: 1">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">c₂ (mol/L)</label>
+            <input type="number" id="c2" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.0001" placeholder="Örn: 0.05">
+            <label class="block text-xs text-gray-500 mt-1">z₂</label>
+            <input type="number" id="z2" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="1" placeholder="Örn: -1">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">c₃ (mol/L)</label>
+            <input type="number" id="c3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.0001" placeholder="Örn: 0.02">
+            <label class="block text-xs text-gray-500 mt-1">z₃</label>
+            <input type="number" id="z3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="1" placeholder="Örn: 2">
+        </div>
+    </div>
+    <button onclick="calculateIonicStrength()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">I = 0.5 Σ cᵢ zᵢ²</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Formül ve Açıklama{% endblock %}
+{% block info_body %}
+İyonik kuvvet, çözeltideki iyonların derişim ve yüklerine bağlı olarak etkileşim gücünü ifade eder. Elektrolitler için aktivite katsayılarını etkiler.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function calculateIonicStrength() {
+    const cs = [document.getElementById('c1').value, document.getElementById('c2').value, document.getElementById('c3').value].map(parseFloat);
+    const zs = [document.getElementById('z1').value, document.getElementById('z2').value, document.getElementById('z3').value].map(parseFloat);
+    let sum = 0;
+    for (let i = 0; i < 3; i++) {
+        const c = cs[i];
+        const z = zs[i];
+        if (!isNaN(c) && !isNaN(z)) sum += c * z * z;
+    }
+    const I = 0.5 * sum;
+    showResult(I.toFixed(6), 'mol/L');
+    window.calcChartData = { type: 'bar', data: [
+        { label: 'c₁z₁²', value: +(isNaN(cs[0])||isNaN(zs[0])?0:(cs[0]*zs[0]*zs[0]).toFixed(6)) },
+        { label: 'c₂z₂²', value: +(isNaN(cs[1])||isNaN(zs[1])?0:(cs[1]*zs[1]*zs[1]).toFixed(6)) },
+        { label: 'c₃z₃²', value: +(isNaN(cs[2])||isNaN(zs[2])?0:(cs[2]*zs[2]*zs[2]).toFixed(6)) },
+        { label: 'I', value: +I.toFixed(6) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <p class="text-sm text-gray-700">Toplam Σ cᵢzᵢ²: <span class="font-bold">${sum.toFixed(6)}</span></p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,67 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Elektroliz{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-water"></i>{% endblock %}
+{% block header_title %}Elektroliz{% endblock %}
+{% block header_desc %}Faraday yasasına göre biriken kütleyi hesapla{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Akım (I, A)</label>
+        <input type="number" id="current" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 2" step="0.0001">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Süre (t, s)</label>
+        <input type="number" id="time" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 600" step="1" min="1">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Molar Kütle (M, g/mol)</label>
+        <input type="number" id="molar_mass" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 63.546" step="0.0001">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Elektron Sayısı (n)</label>
+        <input type="number" id="n_e" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 2" step="1" min="1">
+    </div>
+    <button onclick="calculateElectrolysis()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">m = I·t·M / (n·F)</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Formül ve Açıklama{% endblock %}
+{% block info_body %}
+Faraday yasası elektrolizde biriken maddenin miktarını elektrik yüküne bağlar. F=96485 C·mol⁻¹.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function calculateElectrolysis() {
+    const I = parseFloat(document.getElementById('current').value);
+    const t = parseFloat(document.getElementById('time').value);
+    const M = parseFloat(document.getElementById('molar_mass').value);
+    const n = parseInt(document.getElementById('n_e').value);
+    if (isNaN(I) || isNaN(t) || isNaN(M) || !n) return;
+    const F = 96485.33212;
+    const m = I * t * M / (n * F);
+    const Q = I * t;
+    const mol = Q / (n * F);
+    showResult(m.toFixed(6), 'g');
+    window.calcChartData = { type: 'bar', data: [
+        { label: 'Q', value: +Q.toFixed(4) },
+        { label: 'Mol', value: +mol.toFixed(6) },
+        { label: 'm', value: +m.toFixed(6) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <p class="text-sm text-gray-700">Yük (Q, C): <span class="font-bold">${Q.toFixed(2)}</span></p>
+            <p class="text-sm text-gray-700">Mol miktarı (mol): <span class="font-bold">${mol.toFixed(6)}</span></p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,66 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Elektron Konfigürasyonu{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-layer-group"></i>{% endblock %}
+{% block header_title %}Elektron Konfigürasyonu{% endblock %}
+{% block header_desc %}Atom numarasına göre temel elektron dağılımını hesapla{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Atom Numarası (Z)</label>
+        <input type="number" id="z" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 17" step="1" min="1" max="118">
+    </div>
+    <button onclick="calculateEC()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Açıklama{% endblock %}
+{% block info_body %}
+Aufbau kuralına göre dolum sırası kullanılmıştır: 1s, 2s, 2p, 3s, 3p, 4s, 3d, 4p, 5s, 4d, 5p, 6s, 4f, 5d, 6p, 7s, 5f, 6d, 7p.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function calculateEC() {
+  const Z = parseInt(document.getElementById('z').value);
+  if (!Z || Z < 1) return;
+  const order = [
+    ['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6],
+    ['4s', 2], ['3d', 10], ['4p', 6], ['5s', 2], ['4d', 10],
+    ['5p', 6], ['6s', 2], ['4f', 14], ['5d', 10], ['6p', 6],
+    ['7s', 2], ['5f', 14], ['6d', 10], ['7p', 6]
+  ];
+  let left = Z;
+  const filled = [];
+  for (const [sub, cap] of order) {
+    if (left <= 0) break;
+    const use = Math.min(cap, left);
+    filled.push(`${sub}^${use}`);
+    left -= use;
+  }
+  const conf = filled.join(' ');
+  showResult(conf, '');
+  const shellTotals = {};
+  for (const part of filled) {
+    const n = parseInt(part[0], 10);
+    const e = parseInt(part.split('^')[1], 10);
+    shellTotals[n] = (shellTotals[n] || 0) + e;
+  }
+  const chartData = Object.keys(shellTotals).sort((a,b)=>a-b).map(n => ({ label: `n=${n}`, value: shellTotals[n] }));
+  window.calcChartData = { type: 'bar', data: chartData };
+  const valenceN = Math.max(...Object.keys(shellTotals).map(k=>parseInt(k)));
+  const extra = document.getElementById('extra-results');
+  extra.innerHTML = `
+    <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+      <p class="text-sm text-gray-700">Toplam Elektron: <span class="font-bold">${Z}</span></p>
+      <p class="text-sm text-gray-700">Valans kabuk (n=${valenceN}) elektronları: <span class="font-bold">${shellTotals[valenceN]}</span></p>
+    </div>
+  `;
+}
+</script>
+{% endblock %}
+

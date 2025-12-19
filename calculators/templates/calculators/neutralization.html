@@ -1,0 +1,148 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}Nötralizasyon Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}Nötralizasyon Hesaplayıcı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-scale-balanced"></i>{% endblock %}
+{% block header_title %}Nötralizasyon Hesaplayıcı{% endblock %}
+{% block header_desc %}Asit-baz eşdeğerliğine göre gereken hacmi hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div class="flex gap-4 mb-2">
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="target" value="base" checked class="text-blue-600">
+            <span>Gereken baz hacmini hesapla</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="target" value="acid" class="text-blue-600">
+            <span>Gereken asit hacmini hesapla</span>
+        </label>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+            <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">Asit</div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Molarite (M)</label>
+                <input type="number" id="Ma" step="0.0001" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 0.100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hacim</label>
+                <div class="flex gap-2">
+                    <input type="number" id="Va" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 25.0">
+                    <select id="Va_unit" class="bg-gray-50 border rounded-lg px-2 py-2 outline-none">
+                        <option value="ml">mL</option>
+                        <option value="l">L</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Asit eşdeğerliği (nₐ)</label>
+                <input type="number" id="na" step="1" min="1" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Monoprotik için 1" value="1">
+            </div>
+        </div>
+        <div class="space-y-4">
+            <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">Baz</div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Molarite (M)</label>
+                <input type="number" id="Mb" step="0.0001" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 0.100">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hacim</label>
+                <div class="flex gap-2">
+                    <input type="number" id="Vb" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 25.0">
+                    <select id="Vb_unit" class="bg-gray-50 border rounded-lg px-2 py-2 outline-none">
+                        <option value="ml">mL</option>
+                        <option value="l">L</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Baz eşdeğerliği (n_b)</label>
+                <input type="number" id="nb" step="1" min="1" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Mono-bazik için 1" value="1">
+            </div>
+        </div>
+    </div>
+
+    <button onclick="calcNeutralization()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">
+        Hesapla
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_results %}
+<div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+        <div class="text-xs uppercase tracking-wider">Eşdeğerlik</div>
+        <div class="text-lg font-bold"><span id="eq-acid">-</span> = <span id="eq-base">-</span></div>
+    </div>
+    <div class="px-4 py-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-200">
+        <div class="text-xs uppercase tracking-wider">Önerilen çıktı</div>
+        <div class="text-lg font-bold"><span id="hint-text">-</span></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>Nötralizasyon için eşdeğerlik ilişkisi kullanılır. Monoprotik/bazik sistemde temel ilişki:</p>
+<div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg my-4 font-mono text-center">
+    M<sub>a</sub> · V<sub>a</sub> · n<sub>a</sub> = M<sub>b</sub> · V<sub>b</sub> · n<sub>b</sub>
+    <div class="text-xs mt-2">(V litre cinsinden)</div>
+</div>
+<ul class="list-disc pl-5 space-y-2">
+    <li>Hedefe göre bilinmeyen hacmi çözer ve sonucu litre ve mL olarak verir.</li>
+    <li>n<sub>a</sub> ve n<sub>b</sub> sırasıyla asidin verdiği H⁺ sayısı ve bazın verdiği OH⁻ sayısıdır.</li>
+</ul>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function toLiters(val, unit) {
+    const v = parseFloat(String(val).replace(',', '.'));
+    if (isNaN(v)) return null;
+    return unit === 'ml' ? v / 1000 : v;
+}
+function fmt(v, digits=4) {
+    const n = parseFloat(v);
+    if (isNaN(n)) return '---';
+    return n.toFixed(digits);
+}
+function calcNeutralization() {
+    const target = document.querySelector('input[name=\"target\"]:checked')?.value || 'base';
+    const Ma = parseFloat(document.getElementById('Ma').value);
+    const Va = toLiters(document.getElementById('Va').value, document.getElementById('Va_unit').value);
+    const na = parseFloat(document.getElementById('na').value) || 1;
+    const Mb = parseFloat(document.getElementById('Mb').value);
+    const Vb = toLiters(document.getElementById('Vb').value, document.getElementById('Vb_unit').value);
+    const nb = parseFloat(document.getElementById('nb').value) || 1;
+    if (!Ma || !Mb || !na || !nb) return;
+    if (target === 'base') {
+        if (!Va) return;
+        const Vb_req = (Ma * Va * na) / (Mb * nb);
+        showResult(fmt(Vb_req, 4), 'L');
+        document.getElementById('eq-acid').textContent = fmt(Ma * Va * na, 6);
+        document.getElementById('eq-base').textContent = fmt(Mb * Vb_req * nb, 6);
+        document.getElementById('hint-text').textContent = `${(Vb_req*1000).toFixed(2)} mL baz gerekir`;
+        window.calcChartData = { type: 'bar', data: [
+            { label: 'Asit eşdeğeri', value: +(Ma * Va * na).toFixed(6) },
+            { label: 'Baz eşdeğeri', value: +(Mb * Vb_req * nb).toFixed(6) },
+            { label: 'Baz hacmi (L)', value: +Vb_req.toFixed(6) }
+        ]};
+    } else {
+        if (!Vb) return;
+        const Va_req = (Mb * Vb * nb) / (Ma * na);
+        showResult(fmt(Va_req, 4), 'L');
+        document.getElementById('eq-acid').textContent = fmt(Ma * Va_req * na, 6);
+        document.getElementById('eq-base').textContent = fmt(Mb * Vb * nb, 6);
+        document.getElementById('hint-text').textContent = `${(Va_req*1000).toFixed(2)} mL asit gerekir`;
+        window.calcChartData = { type: 'bar', data: [
+            { label: 'Asit eşdeğeri', value: +(Ma * Va_req * na).toFixed(6) },
+            { label: 'Baz eşdeğeri', value: +(Mb * Vb * nb).toFixed(6) },
+            { label: 'Asit hacmi (L)', value: +Va_req.toFixed(6) }
+        ]};
+    }
+}
+</script>
+{% endblock %}
+

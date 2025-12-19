@@ -1,0 +1,61 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Tampon Kapasitesi{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-flask"></i>{% endblock %}
+{% block header_title %}Tampon Kapasitesi{% endblock %}
+{% block header_desc %}Zayıf asit-baz tampon çözeltileri için kapasite hesabı{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Toplam Derişim (C, mol/L)</label>
+        <input type="number" id="c_total" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 0.1" step="0.0001">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Asit Ka</label>
+        <input type="number" id="ka" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 1.8e-5" step="0.0000001">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">pH</label>
+        <input type="number" id="ph" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 4.75" step="0.01">
+    </div>
+    <button onclick="calculateBufferCapacity()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">β ≈ 2.303 × C × Ka × [H+]/(Ka + [H+])²</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Formül ve Açıklama{% endblock %}
+{% block info_body %}
+Tampon kapasitesi, çözeltiye eklenen güçlü asit veya baz karşısında pH değişimine gösterilen direnci ifade eder. Zayıf asit–eşlenik baz tamponu için yaklaşık formül kullanılır.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function calculateBufferCapacity() {
+    const C = parseFloat(document.getElementById('c_total').value);
+    const Ka = parseFloat(document.getElementById('ka').value);
+    const pH = parseFloat(document.getElementById('ph').value);
+    if (!C || !Ka || !pH) return;
+    const H = Math.pow(10, -pH);
+    const beta = 2.303 * C * Ka * H / Math.pow(Ka + H, 2);
+    showResult(beta.toFixed(6), '');
+    window.calcChartData = { type: 'bar', data: [
+        { label: 'C', value: +C.toFixed(4) },
+        { label: 'Ka', value: +Ka.toExponential(2) },
+        { label: '[H+]', value: +H.toExponential(2) },
+        { label: 'β', value: +beta.toFixed(6) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <p class="text-sm text-gray-700">[H+] (mol/L): <span class="font-bold">${H.toExponential(3)}</span></p>
+            <p class="text-sm text-gray-700">β birimsiz: <span class="font-bold">${beta.toFixed(6)}</span></p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
+

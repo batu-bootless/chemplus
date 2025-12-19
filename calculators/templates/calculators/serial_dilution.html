@@ -1,0 +1,70 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Seri Seyreltme{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-arrow-down-wide-short"></i>{% endblock %}
+{% block header_title %}Seri Seyreltme Hesaplayıcısı{% endblock %}
+{% block header_desc %}Adım adım seyreltme işlemlerinde son derişimi hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Başlangıç Derişimi (C₀)</label>
+        <input type="number" id="initial-conc" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 1.0">
+    </div>
+    
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Seyreltme Faktörü (Her Adım)</label>
+        <input type="number" id="dilution-factor" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 10 (1:10 seyreltme)">
+        <p class="text-xs text-gray-500 mt-1">Örn: 1 mL alıp 9 mL çözücüye eklemek 10 kat seyreltmedir.</p>
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Adım Sayısı (n)</label>
+        <input type="number" id="steps" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 3">
+    </div>
+
+    <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition transform hover:scale-[1.02] shadow-lg mt-4">
+        Hesapla
+    </button>
+</div>
+
+<script>
+    function calculate() {
+        const c0 = parseFloat(document.getElementById('initial-conc').value);
+        const df = parseFloat(document.getElementById('dilution-factor').value);
+        const n = parseFloat(document.getElementById('steps').value);
+        
+        if (c0 && df && n && df > 1) {
+            // Formula: Cn = C0 / (DF ^ n)
+            const finalConc = c0 / Math.pow(df, n);
+            
+            // Format result based on magnitude
+            let displayResult = finalConc;
+            if (finalConc < 0.0001) {
+                displayResult = finalConc.toExponential(3);
+            } else {
+                displayResult = finalConc.toFixed(6);
+            }
+            
+            showResult(displayResult, "Son Derişim");
+        } else {
+            alert("Lütfen geçerli değerler giriniz. Seyreltme faktörü 1'den büyük olmalıdır.");
+        }
+    }
+</script>
+{% endblock %}
+
+{% block explanation %}
+<p class="mb-4">
+    <strong>Seri Seyreltme</strong>, bir maddenin derişimini adım adım azaltmak için kullanılan bir tekniktir. Genellikle mikrobiyoloji ve biyokimyada kullanılır.
+</p>
+<div class="bg-blue-50 p-4 rounded-lg border border-blue-100 my-4 font-mono text-sm text-blue-800">
+    Son Derişim = Başlangıç Derişimi / (Seyreltme Faktörü)<sup>Adım Sayısı</sup>
+</div>
+<p>
+    Örneğin, 1 M'lık bir çözeltiyi her adımda 10 kat seyreltirseniz:<br>
+    1. Adım: 0.1 M<br>
+    2. Adım: 0.01 M<br>
+    3. Adım: 0.001 M
+</p>
+{% endblock %}

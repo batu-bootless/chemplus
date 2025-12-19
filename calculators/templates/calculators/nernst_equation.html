@@ -1,0 +1,67 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Nernst Denklemi{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-bolt"></i>{% endblock %}
+{% block header_title %}Nernst Denklemi{% endblock %}
+{% block header_desc %}Elektrot potansiyelini sıcaklık ve derişime göre hesapla{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Standart Potansiyel (E₀, V)</label>
+        <input type="number" id="e0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 0.76" step="0.0001">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Elektron Sayısı (n)</label>
+        <input type="number" id="n" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 2" step="1" min="1">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sıcaklık (T, K)</label>
+        <input type="number" id="t" value="298.15" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.01">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Reaksiyon Bölümü (Q)</label>
+        <input type="number" id="q" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 0.1" step="0.0001" min="0.0000001">
+    </div>
+    <button onclick="calculateNernst()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">E = E₀ − (RT/nF) ln(Q)</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Formül ve Açıklama{% endblock %}
+{% block info_body %}
+Nernst denklemi, elektrokimyasal hücrelerde potansiyelin derişim ve sıcaklığa bağlı değişimini verir. R=8.314 J·mol⁻¹·K⁻¹, F=96485 C·mol⁻¹.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function calculateNernst() {
+    const E0 = parseFloat(document.getElementById('e0').value);
+    const n = parseInt(document.getElementById('n').value);
+    const T = parseFloat(document.getElementById('t').value);
+    const Q = parseFloat(document.getElementById('q').value);
+    if (isNaN(E0) || !n || isNaN(T) || isNaN(Q) || Q <= 0) return;
+    const R = 8.314;
+    const F = 96485.33212;
+    const E = E0 - (R * T / (n * F)) * Math.log(Q);
+    showResult(E.toFixed(6), 'V');
+    window.calcChartData = { type: 'bar', data: [
+        { label: 'E₀', value: +E0.toFixed(6) },
+        { label: 'n', value: +n },
+        { label: 'T', value: +T.toFixed(2) },
+        { label: 'Q', value: +Q.toFixed(6) },
+        { label: 'E', value: +E.toFixed(6) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <p class="text-sm text-gray-700">RT/nF: <span class="font-bold">${(R*T/(n*F)).toExponential(3)}</span></p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,793 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 relative overflow-hidden">
+    <!-- Decorative BG -->
+    <div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 -z-10"></div>
+    <div class="absolute top-20 right-0 w-72 h-72 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
+    <div class="absolute top-40 left-10 w-72 h-72 bg-purple-100 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-4xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-8 text-sm font-medium" data-aos="fade-down">
+                <a href="{% url 'home' %}" class="text-gray-400 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition flex items-center gap-1">
+                    <i class="fa-solid fa-home"></i> Ana Sayfa
+                </a>
+                <span class="mx-3 text-gray-300 dark:text-gray-500">/</span>
+                <a href="{% url 'calculator_list' %}" class="text-gray-400 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Araçlar</a>
+                <span class="mx-3 text-gray-300 dark:text-gray-500">/</span>
+                <span class="text-blue-600 dark:text-blue-400" id="tool-name-display">{% block tool_name %}Araç İsmi{% endblock %}</span>
+            </nav>
+
+            <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/50 dark:border-slate-700" data-aos="fade-up">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 p-10 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 dark:bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/20 dark:bg-blue-400/10 rounded-full -ml-10 -mb-10 blur-xl"></div>
+                    
+                    <div class="relative z-10 flex items-center gap-6">
+                        <div class="w-16 h-16 bg-white/10 dark:bg-white/20 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                            {% block tool_icon %}<i class="fa-solid fa-calculator"></i>{% endblock %}
+                        </div>
+                        <div>
+                            <h1 class="text-3xl md:text-4xl font-bold mb-2">{% block header_title %}Hesaplayıcı{% endblock %}</h1>
+                            <p class="text-gray-400 dark:text-gray-300 text-lg">{% block header_desc %}Açıklama{% endblock %}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="p-8 md:p-12">
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <!-- Input Section -->
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
+                                <span class="w-1 h-6 bg-blue-500 rounded-full"></span>
+                                Giriş Değerleri
+                            </h2>
+                            <div class="bg-gray-50/50 dark:bg-slate-900/40 rounded-2xl p-6 border border-gray-100 dark:border-slate-700 calc-form" data-aos="fade-up" data-aos-delay="50">
+                                {% block input_form %}{% endblock %}
+                            </div>
+                            <div class="mt-4">
+                                <button id="reset-form-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Formu Sıfırla</button>
+                            </div>
+                        </div>
+
+                        <!-- Result Section -->
+                        <div class="flex flex-col">
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
+                                <span class="w-1 h-6 bg-green-500 rounded-full"></span>
+                                Sonuçlar
+                            </h2>
+                            <div class="bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-700 rounded-2xl p-8 border border-gray-100 dark:border-slate-700 shadow-inner flex-grow flex flex-col justify-center relative overflow-hidden group" data-aos="zoom-in" data-aos-delay="100">
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 dark:bg-blue-900/30 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700 blur-xl"></div>
+                                
+                                <div id="result-area" class="text-center relative z-10" aria-live="polite">
+                                    <div class="text-gray-400 dark:text-gray-300 text-sm uppercase tracking-wider font-semibold mb-2">Hesaplanan Değer</div>
+                                    <div id="result-value" class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 py-2">---</div>
+                                    <div id="result-unit" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200 font-medium text-sm mt-3">Birim</div>
+                                    <div class="mt-4 flex items-center justify-center gap-3">
+                                        <button id="copy-result-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Kopyala</button>
+                                        <button id="copy-md-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">MD</button>
+                                        <button id="auto-copy-toggle" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">OtoKopya</button>
+                                        <button id="clear-history-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Geçmişi Temizle</button>
+                                        <button id="export-history-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">CSV</button>
+                                        <button id="export-history-json-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">HJSON</button>
+                                        <button id="download-chart-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">PNG</button>
+                                        <button id="download-chart-svg-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">SVG</button>
+                                        <button id="export-result-json-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">JSON</button>
+                                        <button id="share-result-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Paylaş</button>
+                                        <button id="print-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Yazdır</button>
+                                    </div>
+                                </div>
+                                {% block extra_results %}{% endblock %}
+                                <div id="convert-area" class="mt-3 text-center hidden">
+                                    <div class="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-sm">
+                                        <span>Dönüştür:</span>
+                                        <select id="convert-select" class="bg-transparent outline-none">
+                                            <option value="">Seç</option>
+                                        </select>
+                                        <span id="convert-output" class="font-semibold"></span>
+                                    </div>
+                                </div>
+                                <div id="chart-area" class="mt-5 md:mt-6"></div>
+                                <div class="mt-3 flex items-center gap-2 justify-end">
+                                    <label for="chart-type-select" class="text-sm text-gray-600 dark:text-gray-300">Grafik</label>
+                                    <select id="chart-type-select" class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm">
+                                        <option value="bar">Çubuk</option>
+                                        <option value="pie">Pasta</option>
+                                    </select>
+                                    <label for="chart-palette-select" class="text-sm text-gray-600 dark:text-gray-300">Palet</label>
+                                    <select id="chart-palette-select" class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm">
+                                        <option value="default">Varsayılan</option>
+                                        <option value="warm">Sıcak</option>
+                                        <option value="cool">Soğuk</option>
+                                    </select>
+                                    <button id="reset-chart-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">Grafiği Sıfırla</button>
+                                </div>
+                                <div id="history-area" class="mt-6 text-left">
+                                    <div class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">Sonuç Geçmişi</div>
+                                    <ul id="history-list" class="space-y-1 text-sm text-gray-600 dark:text-gray-300"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="mt-12 bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-10 border border-gray-100 dark:border-slate-700" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 flex-shrink-0">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="prose prose-blue max-w-none text-gray-600 dark:text-gray-300 w-full">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 mt-0">Nasıl Çalışır?</h3>
+                        {% block explanation %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wikipedia Section -->
+            <div id="wiki-section" class="mt-8 bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-10 border border-gray-100 dark:border-slate-700 hidden" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-700 flex items-center justify-center text-black dark:text-white flex-shrink-0">
+                        <i class="fa-brands fa-wikipedia-w"></i>
+                    </div>
+                    <div class="prose prose-blue max-w-none text-gray-600 dark:text-gray-300 w-full">
+                        <h3 id="wiki-title" class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 mt-0">Wikipedia Bilgisi</h3>
+                        <p id="wiki-content" class="mb-4">Bilgi yükleniyor...</p>
+                        <div class="flex items-center gap-3">
+                            <a id="wiki-link" href="#" target="_blank" class="text-blue-600 font-semibold hover:underline flex items-center gap-2">
+                                Devamını Oku <i class="fa-solid fa-external-link-alt text-xs"></i>
+                            </a>
+                            <button id="copy-wiki-link-btn" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition">Linki kopyala</button>
+                            <button id="copy-wiki-summary-btn" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition">Özeti kopyala</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tutorial Video Section -->
+            <div id="tutorial-section" class="mt-8 bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-10 border border-gray-100 dark:border-slate-700" data-aos="fade-up" data-aos-delay="250" data-video-id="{% block video_id %}{% endblock %}" data-video-query="{% block video_query %}{% endblock %}">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-300 flex-shrink-0">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div class="w-full">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 mt-0">Öğretici Video</h3>
+                        <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-slate-700 aspect-video bg-black">
+                            <iframe id="tutorial-video-iframe" class="w-full h-full" src="" title="YouTube video oynatıcı" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        </div>
+                        <div id="tutorial-fallback" class="mt-2 text-sm text-gray-500 hidden">Video yüklenemiyorsa arama sonuçlarını açın.</div>
+                        <div class="mt-3">
+                            <button id="open-tutorial-search-btn" class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">YouTube Aramasını Aç</button>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                            Kaynak: <a href="https://www.youtube.com/@KhanAcademyTurkce" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline">Khan Academy Türkçe</a> veya YouTube
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showResult(value, unit) {
+        const resultValue = document.getElementById('result-value');
+        const resultUnit = document.getElementById('result-unit');
+        const parseNum = (v) => {
+            const n = parseFloat(String(v).replace(',', '.'));
+            return isNaN(n) ? null : n;
+        };
+        const oldVal = parseNum(resultValue.dataset.lastValue || resultValue.textContent);
+        const newVal = parseNum(value);
+        const duration = 600;
+        const start = performance.now();
+        if (newVal !== null && oldVal !== null) {
+            function step(ts) {
+                const p = Math.min((ts - start) / duration, 1);
+                const cur = oldVal + (newVal - oldVal) * p;
+                resultValue.textContent = cur.toFixed(String(value).split('.').length > 1 ? String(value).split('.')[1].length : 0);
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        } else {
+            resultValue.textContent = value;
+        }
+        resultValue.dataset.lastValue = value;
+        resultUnit.textContent = unit || '';
+        resultValue.classList.add('scale-105');
+        setTimeout(() => resultValue.classList.remove('scale-105'), 200);
+        updateChart();
+        if (typeof updateConversions === 'function') updateConversions();
+        addToHistory(value, unit);
+    }
+
+    function getToolName() {
+        const el = document.getElementById('tool-name-display');
+        return el ? el.textContent.trim() : 'Hesaplayıcı';
+    }
+    function getHistoryKey() {
+        return 'calc_history_' + getToolName().replace(/\s+/g,'_').toLowerCase();
+    }
+    function addToHistory(value, unit) {
+        try {
+            const key = getHistoryKey();
+            const prev = JSON.parse(localStorage.getItem(key) || '[]');
+            const entry = { v: String(value), u: String(unit||''), t: Date.now() };
+            const next = [entry, ...prev].slice(0, 10);
+            localStorage.setItem(key, JSON.stringify(next));
+            renderHistory();
+        } catch {}
+    }
+    function renderHistory() {
+        const ul = document.getElementById('history-list');
+        if (!ul) return;
+        try {
+            const key = getHistoryKey();
+            const items = JSON.parse(localStorage.getItem(key) || '[]');
+            ul.innerHTML = '';
+            items.forEach(it => {
+                const li = document.createElement('li');
+                const d = new Date(it.t);
+                const ts = d.toLocaleString();
+                li.innerHTML = `<button class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition mr-2 text-xs">Kopyala</button><span class="text-gray-700 dark:text-gray-200">${it.v} ${it.u}</span><span class="text-gray-400 ml-2">${ts}</span>`;
+                const btn = li.querySelector('button');
+                btn.addEventListener('click', () => {
+                    navigator.clipboard?.writeText(`${it.v} ${it.u}`);
+                });
+                ul.appendChild(li);
+            });
+        } catch {}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        renderHistory();
+        const copyBtn = document.getElementById('copy-result-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const val = document.getElementById('result-value').textContent.trim();
+                const unit = document.getElementById('result-unit').textContent.trim();
+                if (val) navigator.clipboard?.writeText(`${val} ${unit}`);
+                if (window.showToast) window.showToast('Kopyalandı');
+            });
+        }
+        const clearBtn = document.getElementById('clear-history-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                try {
+                    localStorage.removeItem(getHistoryKey());
+                    renderHistory();
+                } catch {}
+                if (window.showToast) window.showToast('Geçmiş temizlendi');
+            });
+        }
+        const exportBtn = document.getElementById('export-history-btn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                try {
+                    const raw = localStorage.getItem(getHistoryKey()) || '[]';
+                    const arr = JSON.parse(raw);
+                    const lines = [['değer','birim','zaman']].concat(arr.map(x => [x.v, x.u, new Date(x.t).toISOString()]));
+                    const csv = lines.map(r => r.map(v => String(v).includes(',') ? '"' + String(v).replace(/"/g,'""') + '"' : String(v)).join(',')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = getToolName().replace(/\s+/g,'_').toLowerCase() + '_history.csv';
+                    a.click();
+                    if (window.showToast) window.showToast('CSV indiriliyor');
+                } catch {}
+            });
+        }
+        const exportJsonBtn = document.getElementById('export-result-json-btn');
+        if (exportJsonBtn) {
+            exportJsonBtn.addEventListener('click', () => {
+                const val = document.getElementById('result-value').textContent.trim();
+                const unit = document.getElementById('result-unit').textContent.trim();
+                const dataObj = window.calcChartData || getDefaultChartData();
+                const obj = { tool: getToolName(), value: val, unit, chart: dataObj && dataObj.data ? dataObj : null, ts: new Date().toISOString() };
+                const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = getToolName().replace(/\s+/g,'_').toLowerCase() + '_result.json';
+                a.click();
+                if (window.showToast) window.showToast('JSON indiriliyor');
+            });
+        }
+        const exportHistoryJsonBtn = document.getElementById('export-history-json-btn');
+        if (exportHistoryJsonBtn) {
+            exportHistoryJsonBtn.addEventListener('click', () => {
+                try {
+                    const raw = localStorage.getItem(getHistoryKey()) || '[]';
+                    const arr = JSON.parse(raw);
+                    const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = getToolName().replace(/\s+/g,'_').toLowerCase() + '_history.json';
+                    a.click();
+                    if (window.showToast) window.showToast('JSON indiriliyor');
+                } catch {}
+            });
+        }
+        const copyMdBtn = document.getElementById('copy-md-btn');
+        if (copyMdBtn) {
+            copyMdBtn.addEventListener('click', async () => {
+                const val = document.getElementById('result-value').textContent.trim();
+                const unit = document.getElementById('result-unit').textContent.trim();
+                const md = `### ${getToolName()}\n\n**${val} ${unit}**`;
+                try { await navigator.clipboard?.writeText(md); if (window.showToast) window.showToast('Markdown kopyalandı'); } catch {}
+            });
+        }
+        const autoCopyBtn = document.getElementById('auto-copy-toggle');
+        if (autoCopyBtn) {
+            function keyAuto() { return 'auto_copy_' + getToolName().replace(/\s+/g,'_').toLowerCase(); }
+            function setState(on) { autoCopyBtn.classList.toggle('bg-blue-600', on); autoCopyBtn.classList.toggle('text-white', on); autoCopyBtn.textContent = on ? 'OtoKopya: Açık' : 'OtoKopya'; }
+            try { setState(localStorage.getItem(keyAuto()) === 'true'); } catch {}
+            autoCopyBtn.addEventListener('click', () => {
+                const on = autoCopyBtn.classList.contains('bg-blue-600');
+                const next = !on;
+                setState(next);
+                try { localStorage.setItem(keyAuto(), String(next)); } catch {}
+            });
+            window._autoCopyEnabled = () => { try { return localStorage.getItem(keyAuto()) === 'true'; } catch { return false; } };
+        }
+        const chartTypeSel = document.getElementById('chart-type-select');
+        const chartPaletteSel = document.getElementById('chart-palette-select');
+        if (chartTypeSel) { chartTypeSel.addEventListener('change', updateChart); }
+        if (chartPaletteSel) { chartPaletteSel.addEventListener('change', updateChart); }
+        const resetChartBtn = document.getElementById('reset-chart-btn');
+        if (resetChartBtn) { resetChartBtn.addEventListener('click', () => { window.calcChartData = null; const ca=document.getElementById('chart-area'); if (ca) ca.innerHTML=''; }); }
+        const resetBtn = document.getElementById('reset-form-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                const formEl = document.querySelector('.calc-form');
+                if (formEl) formEl.reset();
+                try { localStorage.removeItem('calc_form_' + getToolName().replace(/\s+/g,'_').toLowerCase()); } catch {}
+                if (window.showToast) window.showToast('Form sıfırlandı');
+            });
+        }
+        const dlBtn = document.getElementById('download-chart-btn');
+        if (dlBtn) {
+            dlBtn.addEventListener('click', () => {
+                const svg = document.querySelector('#chart-area svg');
+                if (!svg) return;
+                const serializer = new XMLSerializer();
+                const data = serializer.serializeToString(svg.nodeType === 1 ? svg : svg.parentNode);
+                const canvas = document.createElement('canvas');
+                const rect = svg.getBoundingClientRect();
+                canvas.width = Math.ceil(rect.width);
+                canvas.height = Math.ceil(rect.height);
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    const a = document.createElement('a');
+                    a.href = canvas.toDataURL('image/png');
+                    a.download = getToolName().replace(/\s+/g,'_').toLowerCase() + '_chart.png';
+                    a.click();
+                };
+                img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(data);
+                if (window.showToast) window.showToast('Grafik indiriliyor');
+            });
+        }
+        const dlSvgBtn = document.getElementById('download-chart-svg-btn');
+        if (dlSvgBtn) {
+            dlSvgBtn.addEventListener('click', () => {
+                const svg = document.querySelector('#chart-area svg');
+                if (!svg) return;
+                const serializer = new XMLSerializer();
+                const data = serializer.serializeToString(svg.nodeType === 1 ? svg : svg.parentNode);
+                const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = getToolName().replace(/\s+/g,'_').toLowerCase() + '_chart.svg';
+                a.click();
+                if (window.showToast) window.showToast('SVG indiriliyor');
+            });
+        }
+        const shareBtn = document.getElementById('share-result-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const val = document.getElementById('result-value').textContent.trim();
+                const unit = document.getElementById('result-unit').textContent.trim();
+                const text = `${getToolName()}: ${val} ${unit}`;
+                try {
+                    if (navigator.share) {
+                        await navigator.share({ title: getToolName(), text, url: location.href });
+                    } else {
+                        await navigator.clipboard?.writeText(text);
+                        if (window.showToast) window.showToast('Panoya kopyalandı');
+                    }
+                } catch {}
+            });
+        }
+        const printBtn = document.getElementById('print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', () => {
+                window.print();
+            });
+        }
+        const copyWikiBtn = document.getElementById('copy-wiki-link-btn');
+        if (copyWikiBtn) {
+            copyWikiBtn.addEventListener('click', () => {
+                const href = document.getElementById('wiki-link')?.href || '';
+                if (href) {
+                    navigator.clipboard?.writeText(href);
+                    if (window.showToast) window.showToast('Link kopyalandı');
+                }
+            });
+        }
+        const copyWikiSummaryBtn = document.getElementById('copy-wiki-summary-btn');
+        if (copyWikiSummaryBtn) {
+            copyWikiSummaryBtn.addEventListener('click', async () => {
+                const text = (document.getElementById('wiki-content')?.textContent || '').trim();
+                if (text) {
+                    try { await navigator.clipboard?.writeText(text); if (window.showToast) window.showToast('Özet kopyalandı'); } catch {}
+                }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const termElement = document.getElementById('tool-name-display');
+        if (!termElement) return;
+        const rawTerm = termElement.textContent.trim();
+        if (!rawTerm) return;
+        const wikiTermMap = {
+            "Molekül Ağırlığı": "Molar kütle",
+            "Molarite Hesaplayıcı": "Molarite",
+            "pH Hesaplayıcı": "pH",
+            "İdeal Gaz Yasası": "İdeal gaz yasası"
+        };
+        const sanitized = rawTerm.replace(/Hesaplayıcı/gi, '').trim();
+        const term = wikiTermMap[rawTerm] || sanitized || rawTerm;
+        async function tryFetch(lang, q) {
+            const searchUrl = `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(q)}&limit=1&namespace=0&format=json&origin=*`;
+            const searchRes = await fetch(searchUrl);
+            const searchData = await searchRes.json();
+            if (!(searchData[1] && searchData[1].length > 0)) return null;
+            const title = searchData[1][0];
+            const url = (searchData[3] && searchData[3][0]) ? searchData[3][0] : `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+            const summaryUrl = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+            const summaryRes = await fetch(summaryUrl);
+            const summaryData = await summaryRes.json();
+            if (!summaryData.extract) return null;
+            return { title, url, extract: summaryData.extract };
+        }
+        let wikiLoaded = false;
+        const wikiObserver = new IntersectionObserver(async (entries, ob) => {
+            entries.forEach(async e => {
+                if (e.isIntersecting && !wikiLoaded) {
+                    wikiLoaded = true;
+                    try {
+                        let result = await tryFetch('tr', term);
+                        if (!result) result = await tryFetch('en', term);
+                        if (result) {
+                            document.getElementById('wiki-content').innerHTML = result.extract;
+                            document.getElementById('wiki-link').href = result.url;
+                            document.getElementById('wiki-title').textContent = result.title + " (Wikipedia)";
+                            document.getElementById('wiki-section').classList.remove('hidden');
+                        }
+                    } catch {}
+                    ob.disconnect();
+                }
+            });
+        }, { threshold: 0.2 });
+        const wikiSection = document.getElementById('wiki-section');
+        if (wikiSection) wikiObserver.observe(wikiSection);
+        // Ripple on calculator buttons
+        document.querySelectorAll('.calc-form button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const circle = document.createElement('span');
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                circle.style.width = circle.style.height = `${size}px`;
+                circle.style.left = `${e.clientX - rect.left - size/2}px`;
+                circle.style.top = `${e.clientY - rect.top - size/2}px`;
+                circle.className = 'ripple';
+                btn.appendChild(circle);
+                setTimeout(() => circle.remove(), 500);
+            });
+        });
+        const tutorialSection = document.getElementById('tutorial-section');
+        const tutorialIframe = document.getElementById('tutorial-video-iframe');
+        if (tutorialSection && tutorialIframe) {
+            const vid = (tutorialSection.dataset.videoId || '').trim();
+            const customQuery = (tutorialSection.dataset.videoQuery || '').trim();
+            const baseName = rawTerm || '';
+            const q = customQuery || `${baseName} nasıl yapılır Khan Academy Türkçe`;
+            const tutObserver = new IntersectionObserver((entries, ob) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        if (window.setLoading) window.setLoading(true);
+                        tutorialIframe.src = vid
+                          ? `https://www.youtube.com/embed/${encodeURIComponent(vid)}`
+                          : `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q)}`;
+                        setTimeout(() => {
+                            const fb = document.getElementById('tutorial-fallback');
+                            if (fb) fb.classList.remove('hidden');
+                            if (window.setLoading) window.setLoading(false);
+                        }, 6000);
+                        ob.disconnect();
+                    }
+                });
+            }, { threshold: 0.2 });
+            tutObserver.observe(tutorialSection);
+        }
+        const openTutorialBtn = document.getElementById('open-tutorial-search-btn');
+        if (openTutorialBtn) {
+            openTutorialBtn.addEventListener('click', () => {
+                const vid = (tutorialSection?.dataset.videoId || '').trim();
+                const customQuery = (tutorialSection?.dataset.videoQuery || '').trim();
+                const baseName = rawTerm || '';
+                const q = customQuery || `${baseName} nasıl yapılır Khan Academy Türkçe`;
+                const url = vid ? `https://www.youtube.com/watch?v=${encodeURIComponent(vid)}` : `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+                window.open(url, '_blank', 'noopener');
+            });
+        }
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                const firstBtn = document.querySelector('.calc-form button');
+                if (firstBtn) {
+                    ev.preventDefault();
+                    firstBtn.click();
+                }
+            }
+        });
+        const formEl = document.querySelector('.calc-form');
+        function formKey() { return 'calc_form_' + getToolName().replace(/\s+/g,'_').toLowerCase(); }
+        function saveForm() {
+            if (!formEl) return;
+            const data = {};
+            formEl.querySelectorAll('input,select,textarea').forEach(el => {
+                const k = el.id || el.name || '';
+                if (!k) return;
+                if (el.type === 'checkbox') data[k] = el.checked;
+                else data[k] = el.value;
+            });
+            try { localStorage.setItem(formKey(), JSON.stringify(data)); } catch {}
+        }
+        function loadForm() {
+            if (!formEl) return;
+            try {
+                const raw = localStorage.getItem(formKey());
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                formEl.querySelectorAll('input,select,textarea').forEach(el => {
+                    const k = el.id || el.name || '';
+                    if (!k || !(k in data)) return;
+                    if (el.type === 'checkbox') el.checked = !!data[k];
+                    else el.value = data[k];
+                });
+            } catch {}
+        }
+        loadForm();
+        if (formEl) {
+            formEl.addEventListener('input', saveForm);
+            formEl.addEventListener('change', saveForm);
+            formEl.querySelectorAll('input[type="number"]').forEach(el => {
+                function validate() {
+                    const raw = (el.value || '').replace(',', '.');
+                    const v = parseFloat(raw);
+                    let ok = !isNaN(v);
+                    if (el.min) ok = ok && v >= parseFloat(el.min);
+                    if (el.max) ok = ok && v <= parseFloat(el.max);
+                    el.setAttribute('aria-invalid', ok ? 'false' : 'true');
+                    el.classList.toggle('border-red-500', !ok);
+                }
+                el.addEventListener('input', validate);
+                el.addEventListener('blur', validate);
+                validate();
+            });
+        }
+    });
+
+    const chartConfigMap = {
+        "Molekül Ağırlığı": { type: "bar" },
+        "Molarite Hesaplayıcı": { type: "bar" },
+        "pH Hesaplayıcı": { type: "bar" },
+        "İdeal Gaz Yasası": { type: "bar" }
+    };
+
+    function loadD3() {
+        return new Promise((resolve) => {
+            if (window.d3) return resolve();
+            const s = document.createElement('script');
+            s.src = 'https://d3js.org/d3.v7.min.js';
+            s.defer = true;
+            s.onload = () => resolve();
+            document.head.appendChild(s);
+        });
+    }
+
+    function getDefaultChartData() {
+        const val = parseFloat(document.getElementById('result-value').textContent.replace(',', '.'));
+        const unit = document.getElementById('result-unit').textContent || '';
+        const pohEl = document.getElementById('poh-result');
+        if (!isNaN(val) && pohEl && pohEl.textContent && !isNaN(parseFloat(pohEl.textContent))) {
+            return { type: "bar", data: [{ label: "pH", value: val }, { label: "pOH", value: parseFloat(pohEl.textContent) }] };
+        }
+        if (!isNaN(val)) {
+            return { type: "bar", data: [{ label: unit || "Sonuç", value: val }] };
+        }
+        return null;
+    }
+
+    function renderBarChart(el, data, palette) {
+        el.innerHTML = '';
+        const w = el.clientWidth || 600;
+        const h = Math.max(200, Math.min(360, 56 * data.length));
+        const m = { t: 24, r: 24, b: 40, l: 60 };
+        const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('role', 'img').attr('aria-label', 'Çubuk grafik');
+        const xMax = (d3.max(data, d => d.value) || 1) * 1.2;
+        const x = d3.scaleLinear().domain([0, xMax]).range([m.l, w - m.r]);
+        const y = d3.scaleBand().domain(data.map(d => d.label)).range([m.t, h - m.b]).padding(0.2);
+        const xAxis = d3.axisBottom(d3.scaleLinear().domain([0, d3.max(data, d => d.value) || 1]).range([m.l, w - m.r])).ticks(5);
+        const yAxis = d3.axisLeft(y);
+        svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(xAxis).selectAll('text').style('font-size', '12px');
+        svg.append('g').attr('transform', `translate(${m.l},0)`).call(yAxis).selectAll('text').style('font-size', '12px');
+        const axisColor = document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#374151';
+        const unitText = (document.getElementById('result-unit')?.textContent || '').trim();
+        svg.append('text').attr('x', (w/2)).attr('y', h - 8).attr('text-anchor','middle').text(unitText ? `Değer (${unitText})` : 'Değer').style('font-size','12px').attr('fill', axisColor);
+        svg.append('text').attr('x', m.l - 40).attr('y', m.t - 8).attr('text-anchor','start').text('Parametre').style('font-size','12px').attr('fill', axisColor);
+        // gridlines
+        const xTicks = xAxis.scale().ticks(5);
+        svg.append('g').selectAll('line').data(xTicks).enter().append('line')
+            .attr('x1', d => x(d)).attr('x2', d => x(d)).attr('y1', m.t).attr('y2', h - m.b)
+            .attr('stroke', '#e5e7eb').attr('stroke-width', 1).attr('opacity', .6);
+        // legend
+        const legend = svg.append('g').attr('transform', `translate(${w - m.r - 140}, ${m.t})`);
+        const unique = data.map((d,i)=>({label:d.label,color:palette[i%palette.length]})).slice(0,6);
+        unique.forEach((d,i)=>{
+            legend.append('rect').attr('x',0).attr('y', i*18).attr('width',12).attr('height',12).attr('rx',2).attr('fill', d.color);
+            legend.append('text').attr('x',18).attr('y', i*18+10).text(d.label).style('font-size','12px').attr('fill', axisColor);
+        });
+        const tooltip = document.createElement('div');
+        tooltip.style.position = 'absolute';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.background = 'rgba(17,24,39,.9)';
+        tooltip.style.color = '#fff';
+        tooltip.style.padding = '6px 8px';
+        tooltip.style.borderRadius = '8px';
+        tooltip.style.fontSize = '12px';
+        tooltip.style.transform = 'translate(-50%,-120%)';
+        tooltip.style.display = 'none';
+        el.style.position = 'relative';
+        el.appendChild(tooltip);
+        const bars = svg.selectAll('rect').data(data).enter().append('rect')
+            .attr('x', m.l)
+            .attr('y', d => y(d.label))
+            .attr('height', y.bandwidth())
+            .attr('rx', 8)
+            .attr('width', 0)
+            .attr('fill', (d, i) => palette[i % palette.length])
+            .on('mousemove', function (event, d) {
+                tooltip.style.left = `${event.offsetX}px`;
+                tooltip.style.top = `${event.offsetY}px`;
+                tooltip.textContent = `${d.label}: ${d.value}`;
+                tooltip.style.display = 'block';
+            })
+            .on('mouseleave', function () { tooltip.style.display = 'none'; });
+        bars.transition().duration(600).attr('width', d => x(d.value) - m.l);
+        // value labels
+        svg.selectAll('text.value').data(data).enter().append('text')
+            .attr('class','value')
+            .attr('x', d => Math.max(m.l + 6, x(d.value) + 6))
+            .attr('y', d => y(d.label) + y.bandwidth()/2 + 4)
+            .text(d => d.value)
+            .style('font-size','12px')
+            .attr('fill', axisColor);
+    }
+
+    function renderPieChart(el, data, palette) {
+        el.innerHTML = '';
+        const w = el.clientWidth || 600;
+        const h = Math.max(220, Math.min(360, 220));
+        const r = Math.min(w, h) / 2 - 30;
+        const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('role','img').attr('aria-label','Pasta grafik');
+        const g = svg.append('g').attr('transform', `translate(${w/2},${h/2})`);
+        const total = d3.sum(data, d=>d.value) || 1;
+        const pie = d3.pie().value(d=>d.value);
+        const arc = d3.arc().innerRadius(r*0.45).outerRadius(r);
+        const tooltip = document.createElement('div');
+        Object.assign(tooltip.style,{position:'absolute',pointerEvents:'none',background:'rgba(17,24,39,.9)',color:'#fff',padding:'6px 8px',borderRadius:'8px',fontSize:'12px',transform:'translate(-50%,-120%)',display:'none'});
+        el.style.position='relative'; el.appendChild(tooltip);
+        const arcs = g.selectAll('path').data(pie(data)).enter().append('path')
+          .attr('d', arc)
+          .attr('fill', (d,i)=>palette[i%palette.length])
+          .on('mousemove', function(event,d){
+            tooltip.style.left=`${event.offsetX}px`; tooltip.style.top=`${event.offsetY}px`;
+            const pct = ((d.data.value/total)*100).toFixed(1);
+            tooltip.textContent = `${d.data.label}: ${d.data.value} (${pct}%)`;
+            tooltip.style.display='block';
+          })
+          .on('mouseleave', ()=>tooltip.style.display='none');
+        // percent labels
+        g.selectAll('text.slice-label').data(pie(data)).enter().append('text')
+          .attr('class','slice-label')
+          .attr('transform', d => `translate(${arc.centroid(d)})`)
+          .attr('dy','.35em')
+          .attr('text-anchor','middle')
+          .text(d => `${((d.data.value/total)*100).toFixed(0)}%`)
+          .style('font-size','11px')
+          .attr('fill', document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#111827');
+        // center total
+        g.append('text').attr('text-anchor','middle').attr('dy','0.35em')
+          .text(total.toFixed(2))
+          .style('font-weight','700')
+          .style('font-size','14px')
+          .attr('fill', document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#111827');
+        // legend
+        const legend = svg.append('g').attr('transform', `translate(${w - 180}, 20)`);
+        const legendTextColor = document.documentElement.classList.contains('dark') ? '#e2e8f0' : '#374151';
+        data.slice(0,8).forEach((d,i)=>{
+          legend.append('rect').attr('x',0).attr('y', i*18).attr('width',12).attr('height',12).attr('rx',2).attr('fill', palette[i%palette.length]);
+          legend.append('text').attr('x',18).attr('y', i*18+10).text(`${d.label}: ${d.value}`).style('font-size','12px').attr('fill', legendTextColor);
+        });
+    }
+
+    function updateChart() {
+        const container = document.getElementById('chart-area');
+        if (!container) return;
+        const toolNameEl = document.getElementById('tool-name-display');
+        const toolName = toolNameEl ? toolNameEl.textContent.trim() : '';
+        const cfg = chartConfigMap[toolName] || { type: "bar" };
+        const typeSel = document.getElementById('chart-type-select');
+        const palSel = document.getElementById('chart-palette-select');
+        const typeOverride = typeSel ? typeSel.value : null;
+        const pal = palSel ? palSel.value : 'default';
+        const palette = pal === 'warm'
+            ? ['#b91c1c','#d97706','#f59e0b','#b45309','#a16207','#7c2d12']
+            : pal === 'cool'
+                ? ['#1e3a8a','#0ea5e9','#22d3ee','#14b8a6','#06b6d4','#3b82f6']
+                : ['#1d4ed8', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#a855f7'];
+        const dataObj = window.calcChartData || getDefaultChartData();
+        if (!dataObj || !dataObj.data || !dataObj.data.length) return;
+        const type = typeOverride || dataObj.type || cfg.type;
+        loadD3().then(() => {
+            if (type === 'bar') renderBarChart(container, dataObj.data, palette);
+            if (type === 'pie') renderPieChart(container, dataObj.data, palette);
+        });
+    }
+
+    const chartObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) updateChart();
+        });
+    }, { threshold: 0.2 });
+    const chartAreaInit = document.getElementById('chart-area');
+    if (chartAreaInit) chartObserver.observe(chartAreaInit);
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(updateChart, 200);
+    });
+</script>
+<style>
+.calc-form input, .calc-form select, .calc-form textarea {
+    transition: box-shadow .2s ease, transform .08s ease, border-color .2s ease;
+    background-color: var(--tw-bg-opacity) !important;
+}
+.calc-form input:focus, .calc-form select:focus, .calc-form textarea:focus {
+    box-shadow: 0 0 0 8px rgba(59,130,246,.08);
+    border-color: #3b82f6;
+}
+.calc-form input:hover, .calc-form select:hover {
+    border-color: rgba(59,130,246,.6);
+}
+.ripple {
+    position: absolute;
+    border-radius: 9999px;
+    transform: scale(0);
+    animation: ripple .5s linear;
+    background-color: rgba(255,255,255,.6);
+    pointer-events: none;
+}
+@keyframes ripple {
+    to { transform: scale(2.5); opacity: 0; }
+}
+</style>
+{% block specific_js %}{% endblock %}
+{% endblock %}

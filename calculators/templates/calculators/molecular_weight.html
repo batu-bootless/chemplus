@@ -1,0 +1,143 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}Molekül Ağırlığı Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}Molekül Ağırlığı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-weight-hanging"></i>{% endblock %}
+{% block header_title %}Molekül Ağırlığı{% endblock %}
+{% block header_desc %}Kimyasal formülün molar kütlesini hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-6">
+    <div>
+        <label for="formula" class="block text-sm font-medium text-gray-700 mb-2">Kimyasal Formül</label>
+        <div class="relative">
+            <input type="text" id="formula" placeholder="Örn: H2O, C6H12O6, NaCl" 
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            <div class="absolute right-3 top-3 text-gray-400">
+                <i class="fa-solid fa-flask"></i>
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">Element sembollerini büyük/küçük harf duyarlı giriniz (örn: Ca, Cl).</p>
+    </div>
+
+    <button onclick="calculateMW()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition transform active:scale-95 shadow-lg shadow-blue-200">
+        Hesapla
+    </button>
+    
+    <div id="error-msg" class="hidden p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>Geçersiz formül veya element.</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>
+    Bu hesaplayıcı, girdiğiniz kimyasal formüldeki elementlerin atom ağırlıklarını toplayarak molekülün toplam molar kütlesini bulur.
+    Atom ağırlıkları periyodik tablodaki standart değerlere dayanır.
+</p>
+<ul class="list-disc pl-5 mt-4 space-y-2">
+    <li>Parantez kullanımı desteklenmektedir: <code>Ca(OH)2</code></li>
+    <li>Büyük/Küçük harf önemlidir: <code>Co</code> (Kobalt) vs <code>CO</code> (Karbon Oksit)</li>
+</ul>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+    const atomicWeights = {
+        'H': 1.008, 'He': 4.0026, 'Li': 6.94, 'Be': 9.0122, 'B': 10.81, 'C': 12.011, 'N': 14.007, 'O': 15.999, 'F': 18.998, 'Ne': 20.180,
+        'Na': 22.990, 'Mg': 24.305, 'Al': 26.982, 'Si': 28.085, 'P': 30.974, 'S': 32.06, 'Cl': 35.45, 'K': 39.098, 'Ar': 39.948, 'Ca': 40.078,
+        'Sc': 44.956, 'Ti': 47.867, 'V': 50.942, 'Cr': 51.996, 'Mn': 54.938, 'Fe': 55.845, 'Co': 58.933, 'Ni': 58.693, 'Cu': 63.546, 'Zn': 65.38,
+        'Ga': 69.723, 'Ge': 72.63, 'As': 74.922, 'Se': 78.96, 'Br': 79.904, 'Kr': 83.798, 'Rb': 85.468, 'Sr': 87.62, 'Y': 88.906, 'Zr': 91.224,
+        'Nb': 92.906, 'Mo': 95.95, 'Tc': 98, 'Ru': 101.07, 'Rh': 102.91, 'Pd': 106.42, 'Ag': 107.87, 'Cd': 112.41, 'In': 114.82, 'Sn': 118.71,
+        'Sb': 121.76, 'Te': 127.60, 'I': 126.90, 'Xe': 131.29, 'Cs': 132.91, 'Ba': 137.33, 'La': 138.91, 'Ce': 140.12, 'Pr': 140.91, 'Nd': 144.24,
+        'Pm': 145, 'Sm': 150.36, 'Eu': 151.96, 'Gd': 157.25, 'Tb': 158.93, 'Dy': 162.50, 'Ho': 164.93, 'Er': 167.26, 'Tm': 168.93, 'Yb': 173.05,
+        'Lu': 174.97, 'Hf': 178.49, 'Ta': 180.95, 'W': 183.84, 'Re': 186.21, 'Os': 190.23, 'Ir': 192.22, 'Pt': 195.08, 'Au': 196.97, 'Hg': 200.59,
+        'Tl': 204.38, 'Pb': 207.2, 'Bi': 208.98, 'Po': 209, 'At': 210, 'Rn': 222, 'Fr': 223, 'Ra': 226, 'Ac': 227, 'Th': 232.04, 'Pa': 231.04,
+        'U': 238.03
+    };
+
+    function calculateMW() {
+        const formulaInput = document.getElementById('formula').value.trim();
+        const errorMsg = document.getElementById('error-msg');
+        
+        if (!formulaInput) return;
+
+        try {
+            const parsed = parseFormula(formulaInput);
+            const weight = parsed.totalWeight;
+            showResult(weight.toFixed(4), 'g/mol');
+            errorMsg.classList.add('hidden');
+            const data = Object.keys(parsed.finalCounts).map(el => ({
+                label: el,
+                value: +(parsed.finalCounts[el] * atomicWeights[el]).toFixed(4)
+            })).sort((a,b)=>b.value-a.value).slice(0,10);
+            window.calcChartData = { type: 'pie', data };
+        } catch (e) {
+            errorMsg.classList.remove('hidden');
+            errorMsg.querySelector('span').textContent = "Hata: " + e.message;
+        }
+    }
+
+    function parseFormula(formula) {
+        // Simple regex-based parser (handling parentheses would require a fuller parser, 
+        // but for this demo, let's implement a basic stack-based parser)
+        
+        let stack = [{}]; // Stack of maps {element: count}
+        let i = 0;
+        
+        while (i < formula.length) {
+            let char = formula[i];
+            
+            if (char === '(') {
+                stack.push({});
+                i++;
+            } else if (char === ')') {
+                if (stack.length < 2) throw new Error("Dengesiz parantez");
+                let top = stack.pop();
+                i++;
+                let count = 1;
+                // Check for multiplier after )
+                let start = i;
+                while (i < formula.length && /[0-9]/.test(formula[i])) i++;
+                if (i > start) count = parseInt(formula.substring(start, i));
+                
+                // Merge top into new top
+                let newTop = stack[stack.length - 1];
+                for (let el in top) {
+                    newTop[el] = (newTop[el] || 0) + top[el] * count;
+                }
+            } else if (/[A-Z]/.test(char)) {
+                let start = i;
+                i++;
+                while (i < formula.length && /[a-z]/.test(formula[i])) i++;
+                let element = formula.substring(start, i);
+                
+                // Check for number
+                let count = 1;
+                let numStart = i;
+                while (i < formula.length && /[0-9]/.test(formula[i])) i++;
+                if (i > numStart) count = parseInt(formula.substring(numStart, i));
+                
+                if (!atomicWeights[element]) throw new Error("Bilinmeyen element: " + element);
+                
+                let top = stack[stack.length - 1];
+                top[element] = (top[element] || 0) + count;
+            } else {
+                i++; // Skip other chars or throw error
+            }
+        }
+        
+        if (stack.length !== 1) throw new Error("Dengesiz parantez");
+        
+        let finalCounts = stack[0];
+        let totalWeight = 0;
+        for (let el in finalCounts) {
+            totalWeight += finalCounts[el] * atomicWeights[el];
+        }
+        
+        return { totalWeight, finalCounts };
+    }
+</script>
+{% endblock %}

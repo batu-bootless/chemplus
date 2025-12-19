@@ -1,0 +1,730 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="relative bg-stone-100 dark:bg-gray-900">
+    <div class="container mx-auto px-6 pt-12 md:pt-16">
+        <div class="max-w-6xl mx-auto bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-lg">
+            <div class="px-6 md:px-10 pt-8 md:pt-12">
+                <h1 class="text-[15vw] md:text-9xl font-extrabold tracking-[.15em] leading-none text-gray-900 dark:text-gray-100 text-center">CHEMPLUS</h1>
+                <nav class="mt-6 md:mt-8 flex flex-wrap justify-center gap-4 md:gap-6 text-gray-800 dark:text-gray-200 font-extrabold uppercase tracking-widest text-sm md:text-base">
+                    <a href="{% url 'calculator_list' %}">ARAÇLAR!</a>
+                    <a href="{% url 'forum_home' %}">FORUM!</a>
+                    <a href="#">REAKSİYONLAR!</a>
+                    <a href="#">PROJELER!</a>
+                    <a href="#">İLETİŞİM!</a>
+                    <a href="#">MAĞAZA!</a>
+                </nav>
+                <div class="mt-6 md:mt-8 rounded-lg overflow-hidden">
+                    <div class="bg-black h-48 md:h-64 flex items-center justify-between px-6">
+                        <div class="text-white text-xl md:text-2xl font-bold">MAKE IT SCIENTIFIC</div>
+                        <a href="{% url 'calculator_list' %}" class="px-5 py-2 rounded-lg bg-white text-black font-semibold">START</a>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 md:px-10 py-8 md:py-12 grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-2 py-1 bg-yellow-300 text-black text-xs font-bold rounded">08.12.25</span>
+                        <span class="text-gray-500 dark:text-gray-400 text-xs">by ChemPlus</span>
+                    </div>
+                    <a href="#" class="text-blue-700 dark:text-blue-400 text-xl md:text-2xl underline font-semibold">Makale: Modern Kimya Araçları ile Hesaplama</a>
+                    <div class="mt-6 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                        <div id="wiki-block" class="bg-gray-50 dark:bg-slate-900 h-64 p-4">
+                            <div id="wiki-content" class="h-full overflow-y-auto text-gray-800 dark:text-gray-200"></div>
+                        </div>
+                    </div>
+                </div>
+                <aside class="md:col-span-1">
+                    <div class="rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Ara..." class="w-full border border-gray-300 dark:border-slate-700 rounded-lg pl-3 pr-10 py-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">
+                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-700 p-3">
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">Molarite</div>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <input id="mol-mass" type="number" step="any" placeholder="m (g)" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="mol-mw" type="number" step="any" placeholder="M (g/mol)" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="mol-vol" type="number" step="any" placeholder="V (L)" class="col-span-2 w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                            </div>
+                            <div class="mt-2 flex items-center justify-between">
+                                <button id="mol-calc-btn" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm">Hesapla</button>
+                                <span id="mol-res" class="text-sm text-gray-800 dark:text-gray-200">M = -</span>
+                            </div>
+                        </div>
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-700 p-3">
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">Seyreltme</div>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <input id="dil-c1" type="number" step="any" placeholder="C1" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="dil-v1" type="number" step="any" placeholder="V1 (L)" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="dil-c2" type="number" step="any" placeholder="C2" class="col-span-2 w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                            </div>
+                            <div class="mt-2 flex items-center justify-between">
+                                <button id="dil-calc-btn" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm">V2</button>
+                                <span id="dil-res" class="text-sm text-gray-800 dark:text-gray-200">V2 = - L</span>
+                            </div>
+                        </div>
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-700 p-3">
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">pH → [H+]</div>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <input id="phconv-ph" type="number" step="any" placeholder="pH" class="col-span-2 w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                            </div>
+                            <div class="mt-2 flex items-center justify-between">
+                                <button id="phconv-calc-btn" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm">Hesapla</button>
+                                <span id="phconv-res" class="text-xs text-gray-800 dark:text-gray-200">[H+] = -, pOH = -</span>
+                            </div>
+                        </div>
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-700 p-3">
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">PV=nRT</div>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <input id="gas-n" type="number" step="any" placeholder="n (mol)" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="gas-t" type="number" step="any" placeholder="T (K)" class="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                                <input id="gas-v" type="number" step="any" placeholder="V (L)" class="col-span-2 w-full border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900 text-sm">
+                            </div>
+                            <div class="mt-2 flex items-center justify-between">
+                                <button id="gas-calc-btn" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm">P</button>
+                                <span id="gas-res" class="text-sm text-gray-800 dark:text-gray-200">P = - atm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                        <div id="tool-block" class="bg-gray-50 dark:bg-slate-900 h-40 p-4 flex items-center justify-center">
+                            <div class="w-full">
+                                <div class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">pH Hızlı Araç</div>
+                                <div class="flex items-center gap-3">
+                                    <input id="ph-slider" type="range" min="0" max="14" step="0.1" class="w-full">
+                                    <span id="ph-value" class="w-16 text-right text-gray-800 dark:text-gray-200">7.0</span>
+                                </div>
+                                <div id="ph-status" class="mt-3 px-3 py-2 rounded-lg text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-slate-800">Nötr</div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="py-24 bg-white dark:bg-slate-900 relative">
+    <div class="container mx-auto px-6">
+        <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+            <span class="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase text-sm">Özellikler</span>
+            <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-2 mb-4">Neden ChemPlus?</h2>
+            <p class="text-gray-500 dark:text-gray-300">Bilimsel araştırmalarınızda ve ödevlerinizde size hız kazandıracak özellikler.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="0">
+                <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-6">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Anlık Hesaplama</h3>
+                <p class="text-gray-500 dark:text-gray-300 leading-relaxed">Verileri girdiğiniz anda sonuçları görün. Bekleme yok, karmaşık işlemler yok.</p>
+            </div>
+            <div class="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
+                <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-6">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Mobil Uyumlu</h3>
+                <p class="text-gray-500 dark:text-gray-300 leading-relaxed">Laboratuvarda veya sınıfta, telefonunuzdan tüm araçlara erişin.</p>
+            </div>
+            <div class="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-6">
+                    <i class="fa-solid fa-infinity"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Sürekli Genişleyen Kütüphane</h3>
+                <p class="text-gray-500 dark:text-gray-300 leading-relaxed">Düzenli olarak eklenen yeni hesaplayıcılarla her zaman güncel kalın.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gray-900 dark:bg-gray-950"></div>
+    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600 dark:bg-blue-800 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-600 dark:bg-purple-800 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+    <div class="container mx-auto px-6 relative z-10 text-center">
+        <h2 class="text-4xl font-bold text-white mb-6" data-aos="fade-up">Daha Fazla Araca Mı İhtiyacınız Var?</h2>
+        <p class="text-gray-400 dark:text-gray-300 mb-10 max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Sürekli yeni hesaplama araçları ekliyoruz. İstediğiniz özel bir hesaplayıcı varsa bizimle iletişime geçin.
+        </p>
+        <div class="flex justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+            <button class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/50">
+                İletişime Geç
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Periodic Table Section -->
+<div class="py-24 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
+            <span class="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase text-sm">Periyodik Cetvel</span>
+            <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-2 mb-4">Elementleri Keşfet</h2>
+            <p class="text-gray-500 dark:text-gray-300">Üzerine geldiğinizde atom numarası, sembol ve kategori bilgilerini görün.</p>
+            <div id="periodic-updated" class="mt-2 text-xs text-gray-400 dark:text-gray-500">Güncelleme: <span id="periodic-updated-date">—</span></div>
+        </div>
+
+        <div class="rounded-3xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 p-4 md:p-6 shadow-xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="grid grid-cols-18 gap-1 text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mb-2 hidden" id="periodic-header"></div>
+            <div class="grid grid-cols-18 gap-1 md:gap-1.5 periodic-grid" id="periodic-main"></div>
+            <div class="mt-6">
+                <div class="text-sm text-gray-700 dark:text-gray-200 font-semibold mb-2">Lantanidler</div>
+                <div class="grid grid-cols-18 gap-1 md:gap-1.5 periodic-grid" id="periodic-lanth"></div>
+            </div>
+            <div class="mt-4">
+                <div class="text-sm text-gray-700 dark:text-gray-200 font-semibold mb-2">Aktinitler</div>
+                <div class="grid grid-cols-18 gap-1 md:gap-1.5 periodic-grid" id="periodic-act"></div>
+            </div>
+            <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-500"></span><span class="text-gray-700 dark:text-gray-200">Soygaz</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-yellow-500"></span><span class="text-gray-700 dark:text-gray-200">Halojen</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-500"></span><span class="text-gray-700 dark:text-gray-200">Alkali Metal</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-indigo-500"></span><span class="text-gray-700 dark:text-gray-200">Toprak Alkali</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-500"></span><span class="text-gray-700 dark:text-gray-200">Ametal</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-orange-500"></span><span class="text-gray-700 dark:text-gray-200">Metaloid</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-gray-500"></span><span class="text-gray-700 dark:text-gray-200">Geçiş Metali</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-teal-500"></span><span class="text-gray-700 dark:text-gray-200">Diğer Metaller</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-violet-500"></span><span class="text-gray-700 dark:text-gray-200">Lantanid</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-rose-500"></span><span class="text-gray-700 dark:text-gray-200">Aktinit</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.periodic-grid { grid-template-columns: repeat(18, minmax(0, 1fr)); }
+.cell { position: relative; }
+.cell .card {
+    border-radius: 0.75rem;
+    border-width: 1px;
+    padding: 0.35rem;
+    min-height: 3.8rem;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+    .cell .card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.08); }
+.badge { position:absolute; top:.2rem; left:.3rem; font-size:.65rem }
+.symbol { font-weight: 800; font-size: 1.05rem; }
+.name { font-weight: 800; font-size: 1.05rem; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.weight { font-size: .68rem; opacity:.65; }
+.category-alkali { background-color: #3b82f6; color: #fff }
+.category-alkaline { background-color: #6366f1; color: #fff }
+.category-transition { background-color: #6b7280; color: #fff }
+.category-post { background-color: #14b8a6; color: #fff }
+.category-metalloid { background-color: #f97316; color: #fff }
+.category-nonmetal { background-color: #ec4899; color: #fff }
+.category-halogen { background-color: #eab308; color: #111 }
+.category-noble { background-color: #10b981; color: #fff }
+.category-lanthanide { background-color: #a78bfa; color: #fff }
+.category-actinide { background-color: #f43f5e; color: #fff }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const wikiEl = document.getElementById('wiki-content');
+  function renderWiki(data){
+    const title = data.title || 'Kimya';
+    const extract = data.extract || '';
+    const link = data.content_urls?.desktop?.page || `https://tr.wikipedia.org/wiki/Kimya`;
+    const thumb = data.thumbnail?.source || '';
+    const img = thumb ? `<img src="${thumb}" alt="${title}" class="w-24 h-24 object-cover rounded-lg flex-shrink-0">` : '';
+    wikiEl.innerHTML = `
+      <div class="flex items-start gap-4">
+        ${img}
+        <div class="flex-1">
+          <div class="text-lg font-bold mb-1">${title}</div>
+          <div class="text-sm leading-relaxed">${extract}</div>
+          <a href="${link}" target="_blank" class="inline-block mt-2 text-blue-700 dark:text-blue-400 underline text-sm">Wikipedia</a>
+        </div>
+      </div>
+    `;
+  }
+  fetch('https://tr.wikipedia.org/api/rest_v1/page/summary/Kimya')
+    .then(r=>r.json())
+    .then(d=>renderWiki(d))
+    .catch(()=>{ wikiEl.textContent = 'Bilgi alınamadı.'; });
+  const phSlider = document.getElementById('ph-slider');
+  const phValue = document.getElementById('ph-value');
+  const phStatus = document.getElementById('ph-status');
+  function classifyPH(v){
+    if (v < 7) return {text:'Asidik', bg:'bg-red-100', fg:'text-red-700'};
+    if (v === 7) return {text:'Nötr', bg:'bg-gray-100', fg:'text-gray-700'};
+    return {text:'Bazik', bg:'bg-emerald-100', fg:'text-emerald-700'};
+  }
+  function updatePH(){
+    const v = Number(phSlider.value);
+    phValue.textContent = v.toFixed(1);
+    const c = classifyPH(v);
+    phStatus.className = `mt-3 px-3 py-2 rounded-lg text-sm ${c.bg} ${c.fg}`;
+    phStatus.textContent = c.text;
+  }
+  phSlider.value = 7;
+  updatePH();
+  phSlider.addEventListener('input', updatePH);
+  const molBtn = document.getElementById('mol-calc-btn');
+  const molRes = document.getElementById('mol-res');
+  molBtn.addEventListener('click', ()=>{
+    const m = parseFloat(document.getElementById('mol-mass').value);
+    const M = parseFloat(document.getElementById('mol-mw').value);
+    const V = parseFloat(document.getElementById('mol-vol').value);
+    if(isNaN(m)||isNaN(M)||isNaN(V)||M===0||V===0){ molRes.textContent='M = -'; return; }
+    const r = m/(M*V);
+    molRes.textContent = 'M = ' + r.toFixed(4);
+  });
+  const dilBtn = document.getElementById('dil-calc-btn');
+  const dilRes = document.getElementById('dil-res');
+  dilBtn.addEventListener('click', ()=>{
+    const C1 = parseFloat(document.getElementById('dil-c1').value);
+    const V1 = parseFloat(document.getElementById('dil-v1').value);
+    const C2 = parseFloat(document.getElementById('dil-c2').value);
+    if(isNaN(C1)||isNaN(V1)||isNaN(C2)||C2===0){ dilRes.textContent='V2 = - L'; return; }
+    const V2 = (C1*V1)/C2;
+    dilRes.textContent = 'V2 = ' + V2.toFixed(4) + ' L';
+  });
+  const phcBtn = document.getElementById('phconv-calc-btn');
+  const phcRes = document.getElementById('phconv-res');
+  phcBtn.addEventListener('click', ()=>{
+    const pH = parseFloat(document.getElementById('phconv-ph').value);
+    if(isNaN(pH)){ phcRes.textContent='[H+] = -, pOH = -'; return; }
+    const H = Math.pow(10, -pH);
+    const pOH = 14 - pH;
+    phcRes.textContent = '[H+] = ' + H.toExponential(2) + ', pOH = ' + pOH.toFixed(2);
+  });
+  const gasBtn = document.getElementById('gas-calc-btn');
+  const gasRes = document.getElementById('gas-res');
+  gasBtn.addEventListener('click', ()=>{
+    const n = parseFloat(document.getElementById('gas-n').value);
+    const T = parseFloat(document.getElementById('gas-t').value);
+    const V = parseFloat(document.getElementById('gas-v').value);
+    if(isNaN(n)||isNaN(T)||isNaN(V)||V===0){ gasRes.textContent='P = - atm'; return; }
+    const R = 0.082057;
+    const P = (n*R*T)/V;
+    gasRes.textContent = 'P = ' + P.toFixed(3) + ' atm';
+  });
+});
+// Search/filter
+function setupPeriodicSearch(){
+  const container = document.querySelector('.periodic-grid');
+  const wrap = container.parentElement;
+  const input = document.createElement('input');
+  input.type='text'; input.placeholder='Sembol/Numara ara...';
+  input.className='w-full md:w-64 mb-4 px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm';
+  wrap.insertBefore(input, wrap.firstChild);
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim().toLowerCase();
+    document.querySelectorAll('.periodic-grid .card').forEach(card=>{
+      const badge = card.querySelector('.badge'); const sym = card.querySelector('.symbol');
+      const num = badge?.textContent || ''; const s = sym?.textContent || '';
+      const cat = card.dataset.cat || '';
+      const catDisp = catName(cat).toLowerCase();
+      const hit = q === '' || num.toLowerCase().includes(q) || s.toLowerCase().includes(q) || catDisp.includes(q);
+      card.style.outline = hit && q ? '2px solid #3b82f6' : '';
+      card.style.outlineOffset = hit && q ? '2px' : '';
+      card.style.opacity = hit || q==='' ? '1' : '.25';
+    });
+  });
+}
+const mainRows = [
+  // period 1
+  [{num:1,symbol:'H',cat:'nonmetal',col:1},{num:2,symbol:'He',cat:'noble',col:18}],
+  // period 2
+  [{num:3,symbol:'Li',cat:'alkali',col:1},{num:4,symbol:'Be',cat:'alkaline',col:2},{num:5,symbol:'B',cat:'metalloid',col:13},{num:6,symbol:'C',cat:'nonmetal',col:14},{num:7,symbol:'N',cat:'nonmetal',col:15},{num:8,symbol:'O',cat:'nonmetal',col:16},{num:9,symbol:'F',cat:'halogen',col:17},{num:10,symbol:'Ne',cat:'noble',col:18}],
+  // period 3
+  [{num:11,symbol:'Na',cat:'alkali',col:1},{num:12,symbol:'Mg',cat:'alkaline',col:2},{num:13,symbol:'Al',cat:'post',col:13},{num:14,symbol:'Si',cat:'metalloid',col:14},{num:15,symbol:'P',cat:'nonmetal',col:15},{num:16,symbol:'S',cat:'nonmetal',col:16},{num:17,symbol:'Cl',cat:'halogen',col:17},{num:18,symbol:'Ar',cat:'noble',col:18}],
+  // period 4
+  [{num:19,symbol:'K',cat:'alkali',col:1},{num:20,symbol:'Ca',cat:'alkaline',col:2},{num:21,symbol:'Sc',cat:'transition',col:3},{num:22,symbol:'Ti',cat:'transition',col:4},{num:23,symbol:'V',cat:'transition',col:5},{num:24,symbol:'Cr',cat:'transition',col:6},{num:25,symbol:'Mn',cat:'transition',col:7},{num:26,symbol:'Fe',cat:'transition',col:8},{num:27,symbol:'Co',cat:'transition',col:9},{num:28,symbol:'Ni',cat:'transition',col:10},{num:29,symbol:'Cu',cat:'transition',col:11},{num:30,symbol:'Zn',cat:'transition',col:12},{num:31,symbol:'Ga',cat:'post',col:13},{num:32,symbol:'Ge',cat:'metalloid',col:14},{num:33,symbol:'As',cat:'metalloid',col:15},{num:34,symbol:'Se',cat:'nonmetal',col:16},{num:35,symbol:'Br',cat:'halogen',col:17},{num:36,symbol:'Kr',cat:'noble',col:18}],
+  // period 5
+  [{num:37,symbol:'Rb',cat:'alkali',col:1},{num:38,symbol:'Sr',cat:'alkaline',col:2},{num:39,symbol:'Y',cat:'transition',col:3},{num:40,symbol:'Zr',cat:'transition',col:4},{num:41,symbol:'Nb',cat:'transition',col:5},{num:42,symbol:'Mo',cat:'transition',col:6},{num:43,symbol:'Tc',cat:'transition',col:7},{num:44,symbol:'Ru',cat:'transition',col:8},{num:45,symbol:'Rh',cat:'transition',col:9},{num:46,symbol:'Pd',cat:'transition',col:10},{num:47,symbol:'Ag',cat:'transition',col:11},{num:48,symbol:'Cd',cat:'transition',col:12},{num:49,symbol:'In',cat:'post',col:13},{num:50,symbol:'Sn',cat:'post',col:14},{num:51,symbol:'Sb',cat:'metalloid',col:15},{num:52,symbol:'Te',cat:'metalloid',col:16},{num:53,symbol:'I',cat:'halogen',col:17},{num:54,symbol:'Xe',cat:'noble',col:18}],
+  // period 6 (d-block; lanthanides separate)
+  [{num:55,symbol:'Cs',cat:'alkali',col:1},{num:56,symbol:'Ba',cat:'alkaline',col:2},{num:72,symbol:'Hf',cat:'transition',col:4},{num:73,symbol:'Ta',cat:'transition',col:5},{num:74,symbol:'W',cat:'transition',col:6},{num:75,symbol:'Re',cat:'transition',col:7},{num:76,symbol:'Os',cat:'transition',col:8},{num:77,symbol:'Ir',cat:'transition',col:9},{num:78,symbol:'Pt',cat:'transition',col:10},{num:79,symbol:'Au',cat:'transition',col:11},{num:80,symbol:'Hg',cat:'transition',col:12},{num:81,symbol:'Tl',cat:'post',col:13},{num:82,symbol:'Pb',cat:'post',col:14},{num:83,symbol:'Bi',cat:'post',col:15},{num:84,symbol:'Po',cat:'metalloid',col:16},{num:85,symbol:'At',cat:'halogen',col:17},{num:86,symbol:'Rn',cat:'noble',col:18}],
+  // period 7 (d-block; actinides separate)
+  [{num:87,symbol:'Fr',cat:'alkali',col:1},{num:88,symbol:'Ra',cat:'alkaline',col:2},{num:104,symbol:'Rf',cat:'transition',col:4},{num:105,symbol:'Db',cat:'transition',col:5},{num:106,symbol:'Sg',cat:'transition',col:6},{num:107,symbol:'Bh',cat:'transition',col:7},{num:108,symbol:'Hs',cat:'transition',col:8},{num:109,symbol:'Mt',cat:'transition',col:9},{num:110,symbol:'Ds',cat:'transition',col:10},{num:111,symbol:'Rg',cat:'transition',col:11},{num:112,symbol:'Cn',cat:'transition',col:12},{num:113,symbol:'Nh',cat:'post',col:13},{num:114,symbol:'Fl',cat:'post',col:14},{num:115,symbol:'Mc',cat:'post',col:15},{num:116,symbol:'Lv',cat:'post',col:16},{num:117,symbol:'Ts',cat:'halogen',col:17},{num:118,symbol:'Og',cat:'noble',col:18}]
+];
+const lanthanides = [
+  {num:57,symbol:'La',cat:'transition'},{num:58,symbol:'Ce',cat:'transition'},{num:59,symbol:'Pr',cat:'transition'},{num:60,symbol:'Nd',cat:'transition'},{num:61,symbol:'Pm',cat:'transition'},{num:62,symbol:'Sm',cat:'transition'},{num:63,symbol:'Eu',cat:'transition'},{num:64,symbol:'Gd',cat:'transition'},{num:65,symbol:'Tb',cat:'transition'},{num:66,symbol:'Dy',cat:'transition'},{num:67,symbol:'Ho',cat:'transition'},{num:68,symbol:'Er',cat:'transition'},{num:69,symbol:'Tm',cat:'transition'},{num:70,symbol:'Yb',cat:'transition'},{num:71,symbol:'Lu',cat:'transition'}
+];
+const actinides = [
+  {num:89,symbol:'Ac',cat:'transition'},{num:90,symbol:'Th',cat:'transition'},{num:91,symbol:'Pa',cat:'transition'},{num:92,symbol:'U',cat:'transition'},{num:93,symbol:'Np',cat:'transition'},{num:94,symbol:'Pu',cat:'transition'},{num:95,symbol:'Am',cat:'transition'},{num:96,symbol:'Cm',cat:'transition'},{num:97,symbol:'Bk',cat:'transition'},{num:98,symbol:'Cf',cat:'transition'},{num:99,symbol:'Es',cat:'transition'},{num:100,symbol:'Fm',cat:'transition'},{num:101,symbol:'Md',cat:'transition'},{num:102,symbol:'No',cat:'transition'},{num:103,symbol:'Lr',cat:'transition'}
+];
+
+function catName(cat) {
+  switch(cat) {
+    case 'alkali': return 'Alkali Metal';
+    case 'alkaline': return 'Toprak Alkali';
+    case 'transition': return 'Geçiş Metali';
+    case 'post': return 'Diğer Metaller';
+    case 'metalloid': return 'Metaloid';
+    case 'nonmetal': return 'Ametal';
+    case 'halogen': return 'Halojen';
+    case 'noble': return 'Soygaz';
+    case 'lanthanide': return 'Lantanid';
+    case 'actinide': return 'Aktinit';
+    default: return '';
+  }
+}
+function catClass(cat) {
+  switch(cat) {
+    case 'alkali': return 'category-alkali';
+    case 'alkaline': return 'category-alkaline';
+    case 'transition': return 'category-transition';
+    case 'post': return 'category-post';
+    case 'metalloid': return 'category-metalloid';
+    case 'nonmetal': return 'category-nonmetal';
+    case 'halogen': return 'category-halogen';
+    case 'noble': return 'category-noble';
+    case 'lanthanide': return 'category-lanthanide';
+    case 'actinide': return 'category-actinide';
+    default: return '';
+  }
+}
+
+function renderTable() {
+  const main = document.getElementById('periodic-main');
+  const lanthCont = document.getElementById('periodic-lanth');
+  const actCont = document.getElementById('periodic-act');
+  if (main) main.innerHTML = '';
+  if (lanthCont) lanthCont.innerHTML = '';
+  if (actCont) actCont.innerHTML = '';
+  const renderMainRow = (periodIndex, items) => {
+    const maxCols = 18;
+    for (let c = 1; c <= maxCols; c++) {
+      const found = items.find(x => x.col === c);
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      if (found) {
+        const card = document.createElement('div');
+        card.className = `card border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer`;
+        card.innerHTML = `
+          <div class="badge px-1.5 py-0.5 rounded ${catClass(found.cat)}">${found.num}</div>
+          <div class="flex flex-col items-center justify-center h-full">
+            <div class="name"></div>
+          </div>
+        `;
+        card.setAttribute('aria-label', `Element ${found.symbol}, Atom Numarası ${found.num}`);
+        card.setAttribute('data-cat', found.cat);
+        card.setAttribute('title', `${found.num} • ${found.symbol} • ${catName(found.cat)}`);
+        card.addEventListener('click', () => openElement(found, card));
+        cell.appendChild(card);
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'card bg-transparent border-transparent';
+        cell.appendChild(empty);
+      }
+      main.appendChild(cell);
+    }
+  };
+  mainRows.forEach((row, i) => renderMainRow(i + 1, row));
+  const renderSeries = (containerId, items) => {
+    const cont = document.getElementById(containerId);
+    const startCol = 4;
+    for (let c = 1; c <= 18; c++) {
+      const cell = document.createElement('div'); cell.className = 'cell';
+      if (c >= startCol && c < startCol + items.length) {
+        const el = items[c - startCol];
+        const card = document.createElement('div');
+        card.className = `card border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer`;
+        card.innerHTML = `
+          <div class="badge px-1.5 py-0.5 rounded ${catClass(el.cat)}">${el.num}</div>
+          <div class="flex flex-col items-center justify-center h-full">
+            <div class="name"></div>
+          </div>
+        `;
+        card.setAttribute('aria-label', `Element ${el.symbol}, Atom Numarası ${el.num}`);
+        card.setAttribute('data-cat', el.cat);
+        card.setAttribute('title', `${el.num} • ${el.symbol} • ${catName(el.cat)}`);
+        card.addEventListener('click', () => openElement(el, card));
+        cell.appendChild(card);
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'card bg-transparent border-transparent';
+        cell.appendChild(empty);
+      }
+      cont.appendChild(cell);
+    }
+  };
+  renderSeries('periodic-lanth', lanthanides);
+  renderSeries('periodic-act', actinides);
+}
+document.addEventListener('DOMContentLoaded', renderTable);
+document.addEventListener('DOMContentLoaded', setupPeriodicSearch);
+document.addEventListener('DOMContentLoaded', ()=>{
+  const header = document.getElementById('periodic-header');
+  if (header) { header.innerHTML = ''; }
+  const upd = document.getElementById('periodic-updated-date');
+  if (upd) {
+    const d = new Date();
+    upd.textContent = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+});
+document.addEventListener('DOMContentLoaded', ()=>{
+  const DATA_URL = 'https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json';
+  window.ELEMENTS_INDEX = {};
+  window.DATA_UNAVAILABLE = false;
+  function setServiceNotice(t){
+    const el = document.getElementById('periodic-updated');
+    if (el) {
+      const s = document.createElement('span');
+      s.className = 'ml-2 text-xs font-semibold text-red-600 dark:text-red-400';
+      s.textContent = t;
+      el.appendChild(s);
+    }
+  }
+  function loadDataset(retry){
+    return fetch(DATA_URL).then(r=>{ if(!r.ok) throw new Error('bad'); return r.json(); }).catch(e=>{
+      if (retry && retry>0) {
+        return new Promise(res=>setTimeout(res,800)).then(()=>loadDataset(retry-1));
+      }
+      window.DATA_UNAVAILABLE = true;
+      setServiceNotice('Servis kullanılamıyor, yerel tablo gösteriliyor');
+      throw e;
+    });
+  }
+  function formatWeight(w){ try { const n=Number(w); if(!isFinite(n)||n<=0) return ''; return String(n.toFixed(3)); } catch { return ''; } }
+  function validateElementData(el) {
+    const numValid = typeof el.number === 'number' && el.number >= 1 && el.number <= 118;
+    const sym = String(el.symbol||'');
+    const symValid = /^[A-Z][a-z]{0,2}$/.test(sym);
+    const massValid = typeof el.atomic_mass === 'number' && el.atomic_mass > 0;
+    if (!(numValid && symValid && massValid)) {
+      try { console.warn('Geçersiz element verisi', { number: el.number, symbol: el.symbol, atomic_mass: el.atomic_mass }); } catch {}
+    }
+    return numValid && symValid && massValid;
+  }
+  function mapCategoryName(raw) {
+    const r = String(raw||'').toLowerCase();
+    if (r.includes('alkali metal')) return 'alkali';
+    if (r.includes('alkaline earth')) return 'alkaline';
+    if (r.includes('transition')) return 'transition';
+    if (r.includes('post-transition')) return 'post';
+    if (r.includes('metalloid')) return 'metalloid';
+    if (r.includes('noble gas')) return 'noble';
+    if (r.includes('lanthanide')) return 'lanthanide';
+    if (r.includes('actinide')) return 'actinide';
+    if (r.includes('halogen')) return 'halogen';
+    if (r.includes('nonmetal')) return 'nonmetal';
+    return '';
+  }
+  function buildRowsFromData(list) {
+    const rows = [[],[],[],[],[],[],[]];
+    list.forEach(el=>{
+      validateElementData(el);
+      const cat = mapCategoryName(el.category);
+      const p = Number(el.period||el.ypos||0);
+      const g = Number(el.group||el.xpos||0);
+      const isLa = cat==='lanthanide';
+      const isAc = cat==='actinide';
+      if (!p || !g) return;
+      if (isLa || isAc) return;
+      rows[p-1].push({ num: el.number, symbol: el.symbol, cat, col: g, name: el.name, weight: el.atomic_mass });
+    });
+    const sorted = rows.map(arr=>arr.sort((a,b)=>a.col-b.col));
+    const lanth = list.filter(e=>mapCategoryName(e.category)==='lanthanide').sort((a,b)=>a.number-b.number).map(e=>({num:e.number,symbol:e.symbol,cat:'lanthanide',name:e.name,weight:e.atomic_mass}));
+    const act = list.filter(e=>mapCategoryName(e.category)==='actinide').sort((a,b)=>a.number-b.number).map(e=>({num:e.number,symbol:e.symbol,cat:'actinide',name:e.name,weight:e.atomic_mass}));
+    return { rows: sorted, lanth, act, list };
+  }
+  function renderFromDataset(data) {
+    const main = document.getElementById('periodic-main');
+    const lanthCont = document.getElementById('periodic-lanth');
+    const actCont = document.getElementById('periodic-act');
+    if (main) main.innerHTML = '';
+    if (lanthCont) lanthCont.innerHTML = '';
+    if (actCont) actCont.innerHTML = '';
+    function renderMainRowData(items) {
+      const maxCols = 18;
+      for (let c = 1; c <= maxCols; c++) {
+        const found = items.find(x => x.col === c);
+        const cell = document.createElement('div'); cell.className = 'cell';
+        if (found) {
+          const card = document.createElement('div');
+          card.className = `card border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer`;
+          card.innerHTML = `
+            <div class="badge px-1.5 py-0.5 rounded ${catClass(found.cat)}">${found.num}</div>
+            <div class="flex flex-col items-center justify-center h-full">
+              <div class="name">${found.name||''}</div>
+              <div class="weight">${formatWeight(found.weight)}</div>
+            </div>
+          `;
+          card.setAttribute('aria-label', `Element ${found.name||found.symbol}, Atom Numarası ${found.num}`);
+          card.setAttribute('data-cat', found.cat);
+          card.setAttribute('data-number', String(found.num));
+          card.setAttribute('title', `${found.num} • ${found.name||found.symbol} • ${catName(found.cat)}`);
+          card.addEventListener('click', () => openElement(found, card));
+          cell.appendChild(card);
+        } else {
+          const empty = document.createElement('div'); empty.className = 'card bg-transparent border-transparent';
+          cell.appendChild(empty);
+        }
+        main.appendChild(cell);
+      }
+    }
+    function renderSeriesData(containerId, items) {
+      const cont = document.getElementById(containerId);
+      const startCol = 4;
+      for (let c = 1; c <= 18; c++) {
+        const cell = document.createElement('div'); cell.className = 'cell';
+        if (c >= startCol && c < startCol + items.length) {
+          const el = items[c - startCol];
+          const card = document.createElement('div');
+          card.className = `card border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer`;
+          card.innerHTML = `
+            <div class="badge px-1.5 py-0.5 rounded ${catClass(el.cat)}">${el.num}</div>
+            <div class="flex flex-col items-center justify-center h-full">
+              <div class="name">${el.name||''}</div>
+              <div class="weight">${formatWeight(el.weight)}</div>
+            </div>
+          `;
+          card.setAttribute('aria-label', `Element ${el.name||el.symbol}, Atom Numarası ${el.num}`);
+          card.setAttribute('data-cat', el.cat);
+          card.setAttribute('data-number', String(el.num));
+          card.setAttribute('title', `${el.num} • ${el.name||el.symbol} • ${catName(el.cat)}`);
+          card.addEventListener('click', () => openElement(el, card));
+          cell.appendChild(card);
+        } else {
+          const empty = document.createElement('div'); empty.className = 'card bg-transparent border-transparent';
+          cell.appendChild(empty);
+        }
+        cont.appendChild(cell);
+      }
+    }
+    data.rows.forEach(r => renderMainRowData(r));
+    renderSeriesData('periodic-lanth', data.lanth);
+    renderSeriesData('periodic-act', data.act);
+  }
+  loadDataset(1).then(d=>{
+    const list = d.elements||[];
+    const idx = {};
+    list.forEach(e=>{ idx[String(e.number)] = e; idx[String(e.symbol).toUpperCase()] = e; });
+    window.ELEMENTS_INDEX = idx;
+    renderFromDataset(buildRowsFromData(list));
+  }).catch(()=>{});
+});
+
+// Element modal
+const modal = document.createElement('div');
+modal.className = 'fixed inset-0 z-50 hidden';
+modal.innerHTML = `
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div id="modal-title" class="text-2xl font-extrabold text-gray-900 dark:text-gray-100">Element</div>
+      <button id="modal-close" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-600 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="modal-body" class="space-y-3 text-sm text-gray-700 dark:text-gray-200">
+      <div id="modal-meta" class="flex flex-wrap gap-2"></div>
+      <div id="modal-mass" class="text-gray-600 dark:text-gray-300"></div>
+      <div id="modal-ec" class="text-gray-600 dark:text-gray-300"></div>
+      <div id="modal-summary" class="text-gray-600 dark:text-gray-300">Bilgi yükleniyor...</div>
+      <a id="modal-link" href="#" target="_blank" class="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold hover:underline"><span>Wikipedia</span><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i></a>
+    </div>
+  </div>
+`;
+document.body.appendChild(modal);
+document.getElementById('modal-close').addEventListener('click', () => closeModal());
+modal.addEventListener('click', (e) => { const overlay = modal.querySelector('.absolute.inset-0'); if (e.target === overlay) closeModal(); });
+function openElement(el, cardEl) {
+  document.getElementById('modal-title').textContent = `${el.name || el.symbol}`;
+  const meta = document.getElementById('modal-meta');
+  meta.innerHTML = '';
+  const badge = document.createElement('span');
+  badge.className = `inline-flex items-center px-2 py-1 rounded-full text-xs ${catClass(el.cat)}`;
+  badge.textContent = catName(el.cat);
+  meta.appendChild(badge);
+  const summary = document.getElementById('modal-summary');
+  summary.textContent = 'Daha fazla bilgi için Google aramasına gidin.';
+  const wikiLink = document.getElementById('modal-link');
+  wikiLink.href = `https://www.google.com/search?q=${encodeURIComponent(el.name || el.symbol)}`;
+  wikiLink.textContent = 'Google';
+  const massEl = document.getElementById('modal-mass');
+  const ecEl = document.getElementById('modal-ec');
+  if (massEl) massEl.textContent = '';
+  if (ecEl) ecEl.textContent = '';
+  modal.classList.remove('hidden');
+  const term = el.name || el.symbol;
+  (function(){
+    try {
+      const key = String(el.num) || String(el.symbol||'').toUpperCase();
+      const data = window.ELEMENTS_INDEX ? (window.ELEMENTS_INDEX[key] || window.ELEMENTS_INDEX[String(el.symbol||'').toUpperCase()] || null) : null;
+      if (data) {
+        if (massEl) massEl.textContent = data.atomic_mass ? ('Atom kütlesi: ' + Number(data.atomic_mass).toFixed(3) + ' u') : '';
+        if (ecEl) ecEl.textContent = data.electron_configuration ? ('Elektron dağılımı: ' + data.electron_configuration) : '';
+      }
+    } catch {}
+  })();
+  function computeElectronConfiguration(Z){
+    const order = [['1s',2],['2s',2],['2p',6],['3s',2],['3p',6],['4s',2],['3d',10],['4p',6],['5s',2],['4d',10],['5p',6],['6s',2],['4f',14],['5d',10],['6p',6],['7s',2],['5f',14],['6d',10],['7p',6]];
+    let left = parseInt(Z,10);
+    const filled = [];
+    for (const [sub, cap] of order) { if (left<=0) break; const use = Math.min(cap, left); filled.push(`${sub}^${use}`); left -= use; }
+    return filled.join(' ');
+  }
+  if (ecEl && !ecEl.textContent) { ecEl.textContent = 'Elektron dağılımı: ' + computeElectronConfiguration(el.num); }
+  if (massEl && !massEl.textContent) { massEl.textContent = 'Atom kütlesi: veri yok'; }
+  if (!navigator.onLine) { summary.textContent = 'Servis kullanılamıyor.'; }
+}
+function closeModal(){ modal.classList.add('hidden'); }
+</script>
+<script>
+const hInput = document.getElementById('home-calc-search');
+const hClear = document.getElementById('home-calc-clear');
+const hSugg = document.getElementById('home-calc-suggestions');
+const toolBase = [
+  { title: 'Molekül Ağırlığı', cat: 'Stokiyometri', href: "{% url 'molecular_weight' %}" },
+  { title: 'Molarite', cat: 'Çözeltiler', href: "{% url 'molarity' %}" },
+  { title: 'pH Hesaplayıcı', cat: 'Asit-Baz', href: "{% url 'ph_calculator' %}" },
+  { title: 'İdeal Gaz', cat: 'Gazlar', href: "{% url 'ideal_gas' %}" },
+  { title: 'Yüzde Verim', cat: 'Reaksiyonlar', href: "{% url 'percent_yield' %}" },
+  { title: 'Yarı Ömür', cat: 'Nükleer', href: "{% url 'half_life' %}" },
+  { title: 'Boyle Yasası', cat: 'Gazlar', href: "{% url 'boyles_law' %}" },
+  { title: 'Seyreltme Faktörü', cat: 'Çözeltiler', href: "{% url 'dilution_factor' %}" },
+  { title: 'Kütle Yüzdesi', cat: 'Çözeltiler', href: "{% url 'mass_percent' %}" },
+  { title: 'Karışım Oranı', cat: 'Karışımlar', href: "{% url 'mixing_ratio' %}" },
+  { title: 'Seri Seyreltme', cat: 'Laboratuvar', href: "{% url 'serial_dilution' %}" },
+  { title: 'Çözelti Seyreltme', cat: 'Çözeltiler', href: "{% url 'solution_dilution' %}" },
+];
+const histKey = 'calcSearchHistory';
+function getHist(){ try { return JSON.parse(localStorage.getItem(histKey)||'[]'); } catch { return []; } }
+function setHist(arr){ try { localStorage.setItem(histKey, JSON.stringify(arr.slice(0,8))); } catch {} }
+function renderHSuggestions(list){
+  hSugg.innerHTML='';
+  if(!list.length){ hSugg.classList.add('hidden'); hInput.setAttribute('aria-expanded','false'); return; }
+  list.slice(0,8).forEach((it,idx)=>{
+    const btn=document.createElement('button'); btn.type='button';
+    btn.className='w-full text-left px-4 py-3 hover:bg-gray-50 transition flex items-center justify-between';
+    btn.setAttribute('role','option'); btn.dataset.index=String(idx);
+    const t=document.createElement('span'); t.className='text-gray-800'; t.textContent=typeof it==='string'?it:it.title;
+    const m=document.createElement('span'); m.className='text-xs text-gray-500'; m.textContent=typeof it==='string'?'Geçmiş':it.cat;
+    btn.appendChild(t); btn.appendChild(m);
+    btn.addEventListener('click', ()=>{ if(typeof it==='string'){ hInput.value=it; updateHSuggestions(); } else { window.location.href=it.href; } hSugg.classList.add('hidden'); hInput.setAttribute('aria-expanded','false'); });
+    hSugg.appendChild(btn);
+  });
+  hSugg.classList.remove('hidden'); hInput.setAttribute('aria-expanded','true');
+}
+function updateHSuggestions(){
+  const q=hInput.value.trim().toLowerCase();
+  if(!q){ renderHSuggestions(getHist()); return; }
+  const starts=toolBase.filter(b=>b.title.toLowerCase().startsWith(q));
+  const contains=toolBase.filter(b=>b.title.toLowerCase().includes(q) && !starts.find(x=>x.title===b.title));
+  renderHSuggestions([...starts,...contains]);
+}
+if(hInput){
+  hInput.addEventListener('input', updateHSuggestions);
+  hInput.addEventListener('focus', updateHSuggestions);
+  hInput.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){
+      const q=hInput.value.trim(); if(q){ const hist=getHist(); setHist([q,...hist.filter(x=>x!==q)]); }
+      const first=hSugg.querySelector('button[role="option"]'); if(first){ first.click(); }
+      hSugg.classList.add('hidden'); hInput.setAttribute('aria-expanded','false');
+    }
+    if(e.key==='Escape'){ hSugg.classList.add('hidden'); hInput.setAttribute('aria-expanded','false'); }
+  });
+}
+if(hClear){
+  hClear.addEventListener('click', ()=>{ hInput.value=''; hSugg.classList.add('hidden'); hInput.setAttribute('aria-expanded','false'); hInput.focus(); });
+}
+</script>
+{% endblock %}

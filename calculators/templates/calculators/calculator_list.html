@@ -1,0 +1,521 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 py-16 relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+
+    <div class="container mx-auto px-6 relative z-10">
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-down">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+                Hesaplama <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Araçları</span>
+            </h1>
+            <p class="text-xl text-gray-600">
+                Kimya problemlerinizi çözmek için ihtiyacınız olan tüm araçlar burada. Hızlı, doğru ve kullanımı kolay.
+            </p>
+        </div>
+
+        <div class="max-w-xl mx-auto mb-12 relative" data-aos="fade-up">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fa-solid fa-search text-gray-400"></i>
+            </div>
+            <input id="calc-search" type="search" class="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition shadow-sm text-gray-700 bg-white placeholder-gray-400" placeholder="Hesaplama yapmak için arayın..." aria-label="Hesaplama arama" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="calc-suggestions">
+            <button id="calc-clear" type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition" aria-label="Temizle">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="calc-suggestions" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden hidden" role="listbox"></div>
+        </div>
+
+        <div id="tools-grid" class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition">
+            
+            <!-- Existing Tools -->
+            <a href="{% url 'molecular_weight' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="0">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-weight-hanging"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Stokiyometri</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Molekül Ağırlığı</h3>
+                <p class="text-sm text-gray-500 mb-4">Molar kütle hesaplama.</p>
+                <div class="text-blue-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'molarity' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-purple-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="50">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-vial"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Çözeltiler</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Molarite</h3>
+                <p class="text-sm text-gray-500 mb-4">Konsantrasyon hesaplama.</p>
+                <div class="text-purple-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'ph_calculator' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-xl group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-droplet"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Asit-Baz</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">pH Hesaplayıcı</h3>
+                <p class="text-sm text-gray-500 mb-4">pH ve pOH değerleri.</p>
+            <div class="text-teal-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'buffer_capacity' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-purple-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="140">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Asit-Baz</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Tampon Kapasitesi</h3>
+            <p class="text-sm text-gray-500 mb-4">Zayıf asit-baz tamponları için kapasite.</p>
+            <div class="text-purple-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'nernst_equation' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-amber-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="160">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-xl group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Elektrokimya</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Nernst Denklemi</h3>
+            <p class="text-sm text-gray-500 mb-4">E = E₀ − (RT/nF) ln(Q).</p>
+            <div class="text-amber-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'ionic_strength' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-indigo-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="180">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Çözelti</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">İyonik Kuvvet</h3>
+            <p class="text-sm text-gray-500 mb-4">I = 0.5 Σ cᵢ zᵢ² hesabı.</p>
+            <div class="text-indigo-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'electrolysis' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-cyan-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="200">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center text-cyan-600 text-xl group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-water"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Elektrokimya</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Elektroliz</h3>
+            <p class="text-sm text-gray-500 mb-4">Faraday yasası ile kütle hesabı.</p>
+            <div class="text-cyan-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'chemical_name' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-rose-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="220">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 text-xl group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-cubes-stacked"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Adlandırma</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Kimyasal İsim</h3>
+            <p class="text-sm text-gray-500 mb-4">İyon adları ve yükleri ile isim/formül.</p>
+            <div class="text-rose-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'effective_nuclear_charge' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-lime-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="240">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-lime-50 rounded-xl flex items-center justify-center text-lime-600 text-xl group-hover:bg-lime-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Atomik</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Etkin Nükleer Yük</h3>
+            <p class="text-sm text-gray-500 mb-4">Slater kuralları ile yaklaşık Zₑff.</p>
+            <div class="text-lime-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'electron_configuration' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-fuchsia-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="260">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-fuchsia-50 rounded-xl flex items-center justify-center text-fuchsia-600 text-xl group-hover:bg-fuchsia-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Atomik</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Elektron Konfigürasyonu</h3>
+            <p class="text-sm text-gray-500 mb-4">Aufbau kuralına göre dağılım.</p>
+            <div class="text-fuchsia-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'electronegativity' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-emerald-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="280">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-magnet"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Atomik</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Elektronegatiflik</h3>
+            <p class="text-sm text-gray-500 mb-4">IE ve EA ile Mulliken χ.</p>
+            <div class="text-emerald-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'activation_energy' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="300">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-600 text-xl group-hover:bg-red-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Kinetik</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Aktivasyon Enerjisi</h3>
+            <p class="text-sm text-gray-500 mb-4">İki-nokta Arrhenius ile Eₐ.</p>
+            <div class="text-red-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'arrhenius' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-orange-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="320">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 text-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Kinetik</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Arrhenius</h3>
+            <p class="text-sm text-gray-500 mb-4">k = A·e^(−Eₐ/RT).</p>
+            <div class="text-orange-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'equilibrium_constant' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="340">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 text-xl group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Denge</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Kc</h3>
+            <p class="text-sm text-gray-500 mb-4">Derişimlerle denge sabiti.</p>
+            <div class="text-sky-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'kp_constant' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="360">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-xl group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Denge</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Kp</h3>
+            <p class="text-sm text-gray-500 mb-4">Kısmi basınçlarla denge sabiti.</p>
+            <div class="text-teal-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'actual_yield' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="380">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 text-xl group-hover:bg-slate-600 group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-flask-vial"></i>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Stokiyometri</div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Gerçek Getiri</h3>
+            <p class="text-sm text-gray-500 mb-4">% getiri veya gerçek getiri.</p>
+            <div class="text-slate-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+        </a>
+
+            <a href="{% url 'ideal_gas' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-orange-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="150">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 text-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-wind"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Gazlar</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">İdeal Gaz</h3>
+                <p class="text-sm text-gray-500 mb-4">PV=nRT hesaplaması.</p>
+                <div class="text-orange-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'neutralization' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="175">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-xl group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Asit-Baz</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Nötralizasyon</h3>
+                <p class="text-sm text-gray-500 mb-4">Eşdeğerliğe göre gereken hacim.</p>
+                <div class="text-teal-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- New Tools -->
+            <a href="{% url 'percent_yield' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-green-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl group-hover:bg-green-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Reaksiyonlar</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Yüzde Verim</h3>
+                <p class="text-sm text-gray-500 mb-4">Teorik ve gerçek verim.</p>
+                <div class="text-green-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'half_life' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-indigo-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="250">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Nükleer</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Yarı Ömür</h3>
+                <p class="text-sm text-gray-500 mb-4">Radyoaktif bozunma hesabı.</p>
+                <div class="text-indigo-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'boyles_law' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-cyan-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="300">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center text-cyan-600 text-xl group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-compress-arrows-alt"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Gazlar</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Boyle Yasası</h3>
+                <p class="text-sm text-gray-500 mb-4">P1V1 = P2V2 ilişkisi.</p>
+                <div class="text-cyan-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Dilution Factor -->
+            <a href="{% url 'dilution_factor' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="350">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-600 text-xl group-hover:bg-red-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-vial"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Çözeltiler</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Seyreltme Faktörü</h3>
+                <p class="text-sm text-gray-500 mb-4">Seyreltme oranı hesabı.</p>
+                <div class="text-red-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Mass Percent -->
+            <a href="{% url 'mass_percent' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-pink-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="400">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center text-pink-600 text-xl group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Çözeltiler</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Kütle Yüzdesi</h3>
+                <p class="text-sm text-gray-500 mb-4">Kütlece yüzde derişim.</p>
+                <div class="text-pink-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Mixing Ratio -->
+            <a href="{% url 'mixing_ratio' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-amber-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="450">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-xl group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Karışımlar</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Karışım Oranı</h3>
+                <p class="text-sm text-gray-500 mb-4">Oran hesabı (A:B).</p>
+                <div class="text-amber-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Serial Dilution -->
+            <a href="{% url 'serial_dilution' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-emerald-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="500">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Laboratuvar</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Seri Seyreltme</h3>
+                <p class="text-sm text-gray-500 mb-4">Adım adım seyreltme.</p>
+                <div class="text-emerald-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Solution Dilution -->
+            <a href="{% url 'solution_dilution' %}" class="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-violet-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="550">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600 text-xl group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-flask-vial"></i>
+                    </div>
+                    <div class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">Çözeltiler</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Çözelti Seyreltme</h3>
+                <p class="text-sm text-gray-500 mb-4">M1V1 = M2V2 hesabı.</p>
+                <div class="text-violet-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Kullan <i class="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+<script>
+const input = document.getElementById('calc-search');
+const clearBtn = document.getElementById('calc-clear');
+const suggBox = document.getElementById('calc-suggestions');
+const cards = Array.from(document.querySelectorAll('#tools-grid a'));
+const items = cards.map(card => {
+    const title = (card.querySelector('h3')?.textContent || '').trim();
+    const cat = (card.querySelector('.text-xs')?.textContent || '').trim();
+    const href = card.getAttribute('href') || '#';
+    return { card, title, cat, href };
+});
+const historyKey = 'calcSearchHistory';
+function getHistory() {
+    try { return JSON.parse(localStorage.getItem(historyKey) || '[]'); } catch { return []; }
+}
+function setHistory(arr) {
+    try { localStorage.setItem(historyKey, JSON.stringify(arr.slice(0, 8))); } catch {}
+}
+function showSuggestions(list) {
+    suggBox.innerHTML = '';
+    if (!list.length) { suggBox.classList.add('hidden'); input.setAttribute('aria-expanded','false'); return; }
+    list.slice(0,8).forEach((it, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full text-left px-4 py-3 hover:bg-gray-50 transition flex items-center justify-between';
+        btn.setAttribute('role','option');
+        btn.dataset.index = String(idx);
+        const span = document.createElement('span');
+        span.className = 'text-gray-800';
+        span.textContent = typeof it === 'string' ? it : it.title;
+        const meta = document.createElement('span');
+        meta.className = 'text-xs text-gray-500';
+        meta.textContent = typeof it === 'string' ? 'Geçmiş' : it.cat;
+        btn.appendChild(span);
+        btn.appendChild(meta);
+        btn.addEventListener('click', () => {
+            if (typeof it === 'string') {
+                input.value = it;
+                filterGrid(it);
+            } else {
+                window.location.href = it.href;
+            }
+            suggBox.classList.add('hidden');
+            input.setAttribute('aria-expanded','false');
+        });
+        suggBox.appendChild(btn);
+    });
+    suggBox.classList.remove('hidden');
+    input.setAttribute('aria-expanded','true');
+}
+function filterGrid(q) {
+    const query = q.trim().toLowerCase();
+    let visibleCount = 0;
+    items.forEach(it => {
+        const matched = !query || it.title.toLowerCase().includes(query) || it.cat.toLowerCase().includes(query);
+        it.card.classList.toggle('hidden', !matched);
+        if (matched) visibleCount++;
+    });
+    return visibleCount;
+}
+function updateSuggestions() {
+    const q = input.value;
+    const hist = getHistory();
+    const base = items.map(it => ({ title: it.title, cat: it.cat, href: it.href }));
+    let list = [];
+    if (!q.trim()) {
+        list = hist;
+    } else {
+        const s = q.trim().toLowerCase();
+        const starts = base.filter(b => b.title.toLowerCase().startsWith(s));
+        const contains = base.filter(b => b.title.toLowerCase().includes(s) && !starts.find(x => x.title === b.title));
+        list = [...starts, ...contains];
+    }
+    showSuggestions(list);
+}
+input.addEventListener('input', () => {
+    filterGrid(input.value);
+    updateSuggestions();
+});
+input.addEventListener('focus', () => {
+    updateSuggestions();
+});
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const q = input.value.trim();
+        const hist = getHistory();
+        if (q) {
+            const newHist = [q, ...hist.filter(x => x !== q)];
+            setHistory(newHist);
+        }
+        const vis = filterGrid(q);
+        const firstSugg = suggBox.querySelector('button[role="option"]');
+        if (firstSugg && !suggBox.classList.contains('hidden')) {
+            firstSugg.click();
+        } else if (vis === 1) {
+            const target = items.find(it => !it.card.classList.contains('hidden'));
+            if (target) window.location.href = target.href;
+        }
+        suggBox.classList.add('hidden');
+        input.setAttribute('aria-expanded','false');
+    }
+    if (e.key === 'Escape') {
+        suggBox.classList.add('hidden');
+        input.setAttribute('aria-expanded','false');
+    }
+});
+clearBtn.addEventListener('click', () => {
+    input.value = '';
+    filterGrid('');
+    suggBox.classList.add('hidden');
+    input.setAttribute('aria-expanded','false');
+    input.focus();
+});
+</script>
+{% endblock %}

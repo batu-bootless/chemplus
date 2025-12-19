@@ -1,0 +1,121 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Çözelti Seyreltme{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-flask-vial"></i>{% endblock %}
+{% block header_title %}Çözelti Seyreltme Hesaplayıcısı{% endblock %}
+{% block header_desc %}M₁V₁ = M₂V₂ formülü ile stok çözeltiden istenen derişimi hazırlayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <!-- Selection -->
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Hesaplanacak Değeri Seçin:</label>
+        <select id="calc-mode" onchange="updateInputs()" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="v1">Gerekli Stok Hacmi (V₁)</option>
+            <option value="m2">Son Derişim (M₂)</option>
+            <option value="v2">Son Hacim (V₂)</option>
+            <option value="m1">Stok Derişimi (M₁)</option>
+        </select>
+    </div>
+
+    <!-- Dynamic Inputs -->
+    <div id="inputs-container" class="space-y-4">
+        <!-- Will be populated by JS -->
+    </div>
+
+    <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition transform hover:scale-[1.02] shadow-lg mt-4">
+        Hesapla
+    </button>
+</div>
+
+<script>
+    const labels = {
+        m1: "Stok Derişimi (M₁)",
+        v1: "Stok Hacmi (V₁)",
+        m2: "Son Derişim (M₂)",
+        v2: "Son Hacim (V₂)"
+    };
+
+    function updateInputs() {
+        const mode = document.getElementById('calc-mode').value;
+        const container = document.getElementById('inputs-container');
+        container.innerHTML = '';
+
+        // Determine which inputs to show
+        const inputsToShow = [];
+        if (mode !== 'm1') inputsToShow.push('m1');
+        if (mode !== 'v1') inputsToShow.push('v1');
+        if (mode !== 'm2') inputsToShow.push('m2');
+        if (mode !== 'v2') inputsToShow.push('v2');
+
+        inputsToShow.forEach(key => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <label class="block text-sm font-medium text-gray-700 mb-1">${labels[key]}</label>
+                <input type="number" id="${key}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Değer giriniz">
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function calculate() {
+        const mode = document.getElementById('calc-mode').value;
+        let result = 0;
+        let unit = "";
+
+        // Get values (0 if not present)
+        const m1 = parseFloat(document.getElementById('m1')?.value || 0);
+        const v1 = parseFloat(document.getElementById('v1')?.value || 0);
+        const m2 = parseFloat(document.getElementById('m2')?.value || 0);
+        const v2 = parseFloat(document.getElementById('v2')?.value || 0);
+
+        // M1 * V1 = M2 * V2
+        if (mode === 'v1') { // Calculate V1 = (M2 * V2) / M1
+            if (m1 && m2 && v2) {
+                result = (m2 * v2) / m1;
+                unit = "Hacim Birimi";
+            }
+        } else if (mode === 'm2') { // Calculate M2 = (M1 * V1) / V2
+            if (m1 && v1 && v2) {
+                result = (m1 * v1) / v2;
+                unit = "Derişim Birimi";
+            }
+        } else if (mode === 'v2') { // Calculate V2 = (M1 * V1) / M2
+            if (m1 && v1 && m2) {
+                result = (m1 * v1) / m2;
+                unit = "Hacim Birimi";
+            }
+        } else if (mode === 'm1') { // Calculate M1 = (M2 * V2) / V1
+            if (m2 && v2 && v1) {
+                result = (m2 * v2) / v1;
+                unit = "Derişim Birimi";
+            }
+        }
+
+        if (result > 0 || (result === 0 && (mode === 'm1' || mode === 'm2'))) { // Allow 0 conc technically but usually >0
+             showResult(result.toFixed(4), unit);
+        } else {
+             alert("Lütfen tüm alanlara geçerli pozitif değerler giriniz.");
+        }
+    }
+
+    // Initialize
+    updateInputs();
+</script>
+{% endblock %}
+
+{% block explanation %}
+<p class="mb-4">
+    <strong>Çözelti Seyreltme Denklemi (M₁V₁ = M₂V₂)</strong>, yüksek derişimli bir stok çözeltiden daha düşük derişimli bir çözelti hazırlamak için kullanılır.
+</p>
+<ul class="list-disc pl-5 space-y-2 mb-4">
+    <li><strong>M₁:</strong> Başlangıç (Stok) Derişimi</li>
+    <li><strong>V₁:</strong> Alınması Gereken Stok Hacmi</li>
+    <li><strong>M₂:</strong> İstenen Son Derişim</li>
+    <li><strong>V₂:</strong> İstenen Son Hacim</li>
+</ul>
+<p>
+    Örneğin: 5 M'lık stok çözeltiden 100 mL 0.5 M çözelti hazırlamak için ne kadar almalıyım?<br>
+    V₁ = (0.5 x 100) / 5 = 10 mL. Yani 10 mL stok çözelti alıp üzerini 100 mL'ye tamamlamalısınız.
+</p>
+{% endblock %}

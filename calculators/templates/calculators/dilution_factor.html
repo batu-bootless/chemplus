@@ -1,0 +1,99 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Seyreltme Faktörü{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-vial"></i>{% endblock %}
+{% block header_title %}Seyreltme Faktörü Hesaplayıcısı{% endblock %}
+{% block header_desc %}Bir çözeltinin ne kadar seyreltildiğini hacim veya derişim oranlarını kullanarak hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div class="grid grid-cols-2 gap-2 mb-4">
+        <button onclick="setMode('volume')" id="btn-volume" class="p-2 rounded-lg bg-blue-600 text-white text-sm font-semibold transition">Hacim ile</button>
+        <button onclick="setMode('concentration')" id="btn-concentration" class="p-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 transition">Derişim ile</button>
+    </div>
+
+    <div id="volume-inputs" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Başlangıç Hacmi (Vi)</label>
+            <input type="number" id="vi" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 10">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Son Hacim (Vf)</label>
+            <input type="number" id="vf" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 100">
+        </div>
+    </div>
+
+    <div id="concentration-inputs" class="space-y-4 hidden">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Başlangıç Derişimi (Ci)</label>
+            <input type="number" id="ci" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 1.0">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Son Derişim (Cf)</label>
+            <input type="number" id="cf" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Örn: 0.1">
+        </div>
+    </div>
+
+    <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition transform hover:scale-[1.02] shadow-lg mt-4">
+        Hesapla
+    </button>
+</div>
+
+<script>
+    let mode = 'volume';
+
+    function setMode(newMode) {
+        mode = newMode;
+        if (mode === 'volume') {
+            document.getElementById('volume-inputs').classList.remove('hidden');
+            document.getElementById('concentration-inputs').classList.add('hidden');
+            document.getElementById('btn-volume').className = "p-2 rounded-lg bg-blue-600 text-white text-sm font-semibold transition";
+            document.getElementById('btn-concentration').className = "p-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 transition";
+        } else {
+            document.getElementById('volume-inputs').classList.add('hidden');
+            document.getElementById('concentration-inputs').classList.remove('hidden');
+            document.getElementById('btn-volume').className = "p-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300 transition";
+            document.getElementById('btn-concentration').className = "p-2 rounded-lg bg-blue-600 text-white text-sm font-semibold transition";
+        }
+    }
+
+    function calculate() {
+        let result = 0;
+        
+        if (mode === 'volume') {
+            const vi = parseFloat(document.getElementById('vi').value);
+            const vf = parseFloat(document.getElementById('vf').value);
+            
+            if (vi && vf && vi > 0) {
+                result = vf / vi;
+                showResult(result.toFixed(2), "Katsayı (Kat)");
+            } else {
+                alert("Lütfen geçerli değerler giriniz.");
+            }
+        } else {
+            const ci = parseFloat(document.getElementById('ci').value);
+            const cf = parseFloat(document.getElementById('cf').value);
+            
+            if (ci && cf && cf > 0) {
+                result = ci / cf;
+                showResult(result.toFixed(2), "Katsayı (Kat)");
+            } else {
+                alert("Lütfen geçerli değerler giriniz.");
+            }
+        }
+    }
+</script>
+{% endblock %}
+
+{% block explanation %}
+<p class="mb-4">
+    <strong>Seyreltme Faktörü (DF)</strong>, bir çözeltinin ne kadar seyreltildiğini gösteren orandır. İki şekilde hesaplanabilir:
+</p>
+<ul class="list-disc pl-5 space-y-2 mb-4">
+    <li><strong>Hacim ile:</strong> Son Hacim / Başlangıç Hacmi (Vf / Vi)</li>
+    <li><strong>Derişim ile:</strong> Başlangıç Derişimi / Son Derişim (Ci / Cf)</li>
+</ul>
+<p>
+    Örneğin, 10 mL'lik bir çözeltiyi 100 mL'ye tamamlarsanız, seyreltme faktörü 100/10 = 10 olur. Bu, çözeltinin 10 kat seyreltildiği anlamına gelir.
+</p>
+{% endblock %}

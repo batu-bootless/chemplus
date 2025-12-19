@@ -1,0 +1,116 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}Molarite Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}Molarite Hesaplayıcı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-vial"></i>{% endblock %}
+{% block header_title %}Molarite Hesaplayıcı{% endblock %}
+{% block header_desc %}Çözelti konsantrasyonunu (Molarite) hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <!-- Calculation Mode -->
+    <div class="flex gap-4 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="mode" value="mass" checked onchange="toggleMode()" class="text-blue-600">
+            <span>Kütle üzerinden</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="mode" value="moles" onchange="toggleMode()" class="text-blue-600">
+            <span>Mol üzerinden</span>
+        </label>
+    </div>
+
+    <!-- Mass Input -->
+    <div id="mass-group" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Çözünen Kütlesi (g)</label>
+            <input type="number" id="mass" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 58.5">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Molekül Ağırlığı (g/mol)</label>
+            <input type="number" id="mw" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 58.44">
+        </div>
+    </div>
+
+    <!-- Moles Input (Hidden by default) -->
+    <div id="moles-group" class="hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Mol Sayısı (mol)</label>
+        <input type="number" id="moles" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 1.0">
+    </div>
+
+    <!-- Volume Input -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Hacim</label>
+        <div class="flex gap-2">
+            <input type="number" id="volume" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 500">
+            <select id="vol-unit" class="bg-gray-50 border rounded-lg px-2 py-2 outline-none">
+                <option value="ml">mL</option>
+                <option value="l">L</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="calculateMolarity()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">
+        Hesapla
+    </button>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>Molarite (M), bir litre çözeltide çözünen maddenin mol sayısıdır.</p>
+<div class="bg-gray-100 p-4 rounded-lg my-4 font-mono text-center">
+    M = n / V
+</div>
+<ul class="list-disc pl-5 space-y-2">
+    <li><strong>n:</strong> Mol sayısı (mol) = Kütle (m) / Molekül Ağırlığı (MW)</li>
+    <li><strong>V:</strong> Hacim (Litre)</li>
+</ul>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+    function toggleMode() {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const massGroup = document.getElementById('mass-group');
+        const molesGroup = document.getElementById('moles-group');
+        
+        if (mode === 'mass') {
+            massGroup.classList.remove('hidden');
+            molesGroup.classList.add('hidden');
+        } else {
+            massGroup.classList.add('hidden');
+            molesGroup.classList.remove('hidden');
+        }
+    }
+
+    function calculateMolarity() {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const volumeVal = parseFloat(document.getElementById('volume').value);
+        const volUnit = document.getElementById('vol-unit').value;
+        
+        if (!volumeVal) return;
+
+        let volumeL = volUnit === 'ml' ? volumeVal / 1000 : volumeVal;
+        let moles = 0;
+
+        if (mode === 'mass') {
+            const mass = parseFloat(document.getElementById('mass').value);
+            const mw = parseFloat(document.getElementById('mw').value);
+            if (!mass || !mw) return;
+            moles = mass / mw;
+        } else {
+            moles = parseFloat(document.getElementById('moles').value);
+            if (!moles) return;
+        }
+
+        const molarity = moles / volumeL;
+        showResult(molarity.toFixed(4), 'M (mol/L)');
+        window.calcChartData = { type: 'bar', data: [
+            { label: 'Mol', value: +moles.toFixed(4) },
+            { label: 'Hacim (L)', value: +volumeL.toFixed(4) },
+            { label: 'Molarite', value: +molarity.toFixed(4) }
+        ]};
+    }
+</script>
+{% endblock %}

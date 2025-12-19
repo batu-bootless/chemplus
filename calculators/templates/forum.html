@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12">
+  <div class="container mx-auto px-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Forum</h1>
+        <p class="text-gray-500 dark:text-gray-300">Sorular sorun, cevaplayın, kimya topluluğu ile paylaşın.</p>
+      </div>
+      <button id="new-thread-btn" class="px-4 py-2 rounded-2xl bg-blue-600 text-white hover:bg-blue-500 transition shadow">Yeni Soru</button>
+    </div>
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-2">
+        <a href="?sort=latest{% if q %}&q={{q}}{% endif %}{% if c %}&c={{c}}{% endif %}" class="px-3 py-1.5 rounded-lg text-sm {% if sort == 'latest' %}bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200{% endif %}">Son</a>
+        <a href="?sort=active{% if q %}&q={{q}}{% endif %}{% if c %}&c={{c}}{% endif %}" class="px-3 py-1.5 rounded-lg text-sm {% if sort == 'active' %}bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200{% endif %}">Aktif</a>
+        <a href="?sort=top{% if q %}&q={{q}}{% endif %}{% if c %}&c={{c}}{% endif %}" class="px-3 py-1.5 rounded-lg text-sm {% if sort == 'top' %}bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200{% endif %}">Popüler</a>
+        <a href="#cats" class="px-3 py-1.5 rounded-lg text-sm bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200">Kategoriler</a>
+      </div>
+      <div class="text-sm text-gray-500 dark:text-gray-400">Sayfa {{page}}</div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="md:col-span-1">
+        <div class="rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-4">
+          <div class="relative mb-4">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fa-solid fa-search text-gray-400"></i>
+            </div>
+            <input id="forum-search" type="search" class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 placeholder-gray-400" placeholder="Arayın...">
+            <button id="forum-search-clear" class="absolute inset-y-0 right-0 pr-3 text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div id="forum-suggestions" class="hidden mt-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow">
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Kategoriler</div>
+            <div id="forum-cats" class="flex flex-wrap gap-2" id="cats">
+              <a href="#" data-slug="" class="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">Tümü</a>
+              {% for cat in categories %}
+              <a href="#" data-slug="{{cat.slug}}" class="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">{{cat.name}}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="md:col-span-2">
+        <div id="threads" class="space-y-4">
+          {% for t in threads %}
+          <div class="rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-5">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-xs px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200">{{t.category.name}}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{t.author.username}} • {{t.created_at|timesince}} önce</div>
+            </div>
+            <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{t.title}}</div>
+            <div class="text-gray-600 dark:text-gray-300 mt-2">{{t.content|truncatechars:220}}</div>
+            <div class="mt-4 flex items-center gap-3">
+              <button class="answer-btn px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200" data-id="{{t.id}}">Cevapla</button>
+              <span class="text-sm text-gray-500 dark:text-gray-400">{{t.answers.count}} cevap</span>
+              <button class="report-thread px-3 py-1.5 rounded-lg bg-red-50 text-red-600" data-id="{{t.id}}">Bildir</button>
+            </div>
+            <div class="mt-3 space-y-2">
+              {% for a in t.answers.all|slice:":3" %}
+              <div class="rounded-xl bg-gray-50 dark:bg-slate-700 p-3 flex items-start justify-between">
+                <div>
+                  <div class="text-sm text-gray-700 dark:text-gray-200">{{a.content}}</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{a.author.username}} • {{a.created_at|timesince}} önce</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="vote-answer px-2 py-1 rounded bg-emerald-50 text-emerald-700" data-id="{{a.id}}"><i class="fa-solid fa-thumbs-up"></i></button>
+                  <span class="text-sm text-gray-700 dark:text-gray-200" id="votes-{{a.id}}">{{a.votes}}</span>
+                  <button class="report-answer px-2 py-1 rounded bg-red-50 text-red-600" data-id="{{a.id}}"><i class="fa-solid fa-flag"></i></button>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-gray-500 dark:text-gray-300">Hiç soru yok.</div>
+          {% endfor %}
+        </div>
+        {% if has_next %}
+        <div class="mt-4 flex justify-end">
+          <a href="?page={{page|add:1}}&page_size={{page_size}}&sort={{sort}}{% if q %}&q={{q}}{% endif %}{% if c %}&c={{c}}{% endif %}" class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">Daha Fazla</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<div id="new-thread-modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 p-6">
+    <div class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Yeni Soru</div>
+    <div class="space-y-3">
+      <input id="nt-title" type="text" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Başlık">
+      <select id="nt-cat" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <option value="">Kategori seçin</option>
+        {% for cat in categories %}<option value="{{cat.slug}}">{{cat.name}}</option>{% endfor %}
+      </select>
+      <textarea id="nt-content" rows="5" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="İçerik"></textarea>
+    </div>
+    <div class="mt-4 flex justify-end gap-3">
+      <button id="nt-cancel" class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">İptal</button>
+      <button id="nt-submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Gönder</button>
+    </div>
+  </div>
+  </div>
+<div id="answer-modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 p-6">
+    <div class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Cevap Yaz</div>
+    <textarea id="ans-content" rows="5" class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" placeholder="Cevabınız"></textarea>
+    <div class="mt-4 flex justify-end gap-3">
+      <button id="ans-cancel" class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">İptal</button>
+      <button id="ans-submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Gönder</button>
+    </div>
+  </div>
+</div>
+<script>
+const token = localStorage.getItem('jwt') || '';
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+document.getElementById('new-thread-btn').addEventListener('click', ()=> openModal('new-thread-modal'));
+document.getElementById('nt-cancel').addEventListener('click', ()=> closeModal('new-thread-modal'));
+document.getElementById('nt-submit').addEventListener('click', async ()=>{
+  const title = document.getElementById('nt-title').value.trim();
+  const category = document.getElementById('nt-cat').value;
+  const content = document.getElementById('nt-content').value.trim();
+  if(!title || !category || !content) return;
+  const res = await fetch('{% url "api_forum_threads" %}', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body: JSON.stringify({title, category, content}) });
+  if(res.ok){ location.reload(); }
+});
+let answerThreadId = null;
+document.querySelectorAll('.answer-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ answerThreadId = btn.dataset.id; openModal('answer-modal'); });
+});
+document.getElementById('ans-cancel').addEventListener('click', ()=> closeModal('answer-modal'));
+document.getElementById('ans-submit').addEventListener('click', async ()=>{
+  const content = document.getElementById('ans-content').value.trim();
+  if(!content || !answerThreadId) return;
+  const res = await fetch('{% url "api_forum_answers" %}', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body: JSON.stringify({thread_id: parseInt(answerThreadId), content}) });
+  if(res.ok){ location.reload(); }
+});
+document.querySelectorAll('.vote-answer').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const id = btn.dataset.id;
+    const res = await fetch('{% url "api_forum_vote_answer" %}', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body: JSON.stringify({answer_id: parseInt(id)}) });
+    if(res.ok){ const data = await res.json(); const el = document.getElementById(`votes-${id}`); if(el) el.textContent = data.votes; }
+  });
+});
+document.querySelectorAll('.report-thread').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const id = btn.dataset.id;
+    const reason = prompt('Neden bildiriyorsunuz?') || '';
+    if(!reason.trim()) return;
+    await fetch('{% url "api_forum_report" %}', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body: JSON.stringify({item_type:'thread', item_id: parseInt(id), reason}) });
+  });
+});
+document.querySelectorAll('.report-answer').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const id = btn.dataset.id;
+    const reason = prompt('Neden bildiriyorsunuz?') || '';
+    if(!reason.trim()) return;
+    await fetch('{% url "api_forum_report" %}', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body: JSON.stringify({item_type:'answer', item_id: parseInt(id), reason}) });
+  });
+});
+const searchInput = document.getElementById('forum-search');
+const searchClear = document.getElementById('forum-search-clear');
+const catsEl = document.getElementById('forum-cats');
+const suggEl = document.getElementById('forum-suggestions');
+function applyFilters(){
+  const q = searchInput.value.trim();
+  const active = catsEl.querySelector('a.active');
+  const c = active ? active.dataset.slug : '';
+  const url = new URL(location.href);
+  if(q){ url.searchParams.set('q', q); } else { url.searchParams.delete('q'); }
+  if(c){ url.searchParams.set('c', c); } else { url.searchParams.delete('c'); }
+  location.href = url.toString();
+}
+searchInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') applyFilters(); });
+searchClear.addEventListener('click', ()=>{ searchInput.value=''; applyFilters(); });
+catsEl.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('click', (e)=>{ e.preventDefault(); catsEl.querySelectorAll('a').forEach(x=>x.classList.remove('active')); a.classList.add('active'); applyFilters(); });
+});
+function renderSuggestions(items){
+  if(!items.length){ suggEl.classList.add('hidden'); suggEl.innerHTML=''; return; }
+  const html = items.slice(0,5).map(i=>`<a href="?q=${encodeURIComponent(i.title)}" class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700">${i.title}</a>`).join('');
+  suggEl.innerHTML = html;
+  suggEl.classList.remove('hidden');
+}
+let sTimer = null;
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value.trim();
+  clearTimeout(sTimer);
+  if(!q){ renderSuggestions([]); return; }
+  sTimer = setTimeout(async ()=>{
+    try{
+      const url = new URL('{% url "api_forum_threads" %}', location.origin);
+      url.searchParams.set('q', q);
+      url.searchParams.set('page_size', '5');
+      const res = await fetch(url.toString());
+      if(res.ok){
+        const data = await res.json();
+        renderSuggestions(data.threads || []);
+      }
+    }catch(e){ renderSuggestions([]); }
+  }, 200);
+});
+document.addEventListener('click', (e)=>{ if(!suggEl.contains(e.target) && e.target !== searchInput){ suggEl.classList.add('hidden'); } });
+const initialC = '{{c}}';
+if(initialC !== ''){
+  const initEl = catsEl.querySelector(`a[data-slug="${initialC}"]`);
+  if(initEl){ catsEl.querySelectorAll('a').forEach(x=>x.classList.remove('active')); initEl.classList.add('active'); }
+}
+</script>
+{% endblock %}

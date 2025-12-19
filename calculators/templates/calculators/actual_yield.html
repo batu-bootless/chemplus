@@ -1,0 +1,95 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Gerçek Getiri{% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-flask-vial"></i>{% endblock %}
+{% block header_title %}Gerçek Getiri / Yüzde Getiri{% endblock %}
+{% block header_desc %}Teorik ve gerçek getiri ilişkisini hesapla{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div class="flex gap-4 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="mode" value="percent" checked onchange="toggleMode()" class="text-blue-600">
+            <span>Yüzde Getiriyi Hesapla</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="mode" value="actual" onchange="toggleMode()" class="text-blue-600">
+            <span>Gerçek Getiriyi Hesapla</span>
+        </label>
+    </div>
+    <div id="group-common" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teorik Getiri (g)</label>
+            <input type="number" id="theoretical" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.0001" placeholder="Örn: 5.0">
+        </div>
+    </div>
+    <div id="group-percent" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Gerçek Getiri (g)</label>
+            <input type="number" id="actual" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.0001" placeholder="Örn: 4.2">
+        </div>
+    </div>
+    <div id="group-actual" class="space-y-4 hidden">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Yüzde Getiri (%)</label>
+            <input type="number" id="percent" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" placeholder="Örn: 84">
+        </div>
+    </div>
+    <button onclick="calculateYield()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">% Getiri = (Gerçek/Teorik) × 100</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function toggleMode(){
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  document.getElementById('group-percent').classList.toggle('hidden', mode !== 'percent');
+  document.getElementById('group-actual').classList.toggle('hidden', mode !== 'actual');
+}
+function calculateYield(){
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  const Theo = parseFloat(document.getElementById('theoretical').value);
+  if (isNaN(Theo) || Theo <= 0) return;
+  if (mode === 'percent'){
+    const Act = parseFloat(document.getElementById('actual').value);
+    if (isNaN(Act) || Act < 0) return;
+    const pct = (Act/Theo)*100.0;
+    showResult(pct.toFixed(2), '%');
+    window.calcChartData = { type: 'bar', data: [
+      { label: 'Gerçek', value: +Act.toFixed(4) },
+      { label: 'Teorik', value: +Theo.toFixed(4) },
+      { label: '%', value: +pct.toFixed(2) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+        <p class="text-sm text-gray-700">Gerçek (g): <span class="font-bold">${Act.toFixed(4)}</span></p>
+        <p class="text-sm text-gray-700">Teorik (g): <span class="font-bold">${Theo.toFixed(4)}</span></p>
+      </div>
+    `;
+  } else {
+    const pct = parseFloat(document.getElementById('percent').value);
+    if (isNaN(pct) || pct < 0) return;
+    const Act = Theo * pct / 100.0;
+    showResult(Act.toFixed(4), 'g');
+    window.calcChartData = { type: 'bar', data: [
+      { label: 'Teorik', value: +Theo.toFixed(4) },
+      { label: '%', value: +pct.toFixed(2) },
+      { label: 'Gerçek', value: +Act.toFixed(4) }
+    ]};
+    const extra = document.getElementById('extra-results');
+    extra.innerHTML = `
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+        <p class="text-sm text-gray-700">% Getiri: <span class="font-bold">${pct.toFixed(2)}%</span></p>
+      </div>
+    `;
+  }
+}
+document.addEventListener('DOMContentLoaded', toggleMode);
+</script>
+{% endblock %}
+

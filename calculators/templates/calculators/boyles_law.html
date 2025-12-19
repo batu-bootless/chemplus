@@ -1,0 +1,92 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}Boyle Yasası Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}Boyle Yasası Hesaplayıcı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-compress-arrows-alt"></i>{% endblock %}
+{% block header_title %}Boyle Yasası Hesaplayıcı{% endblock %}
+{% block header_desc %}Sabit sıcaklıkta basınç-hacim ilişkisini hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div class="bg-cyan-50 p-3 rounded-lg text-sm text-cyan-800 mb-4">
+        Hesaplamak istediğiniz alanı <strong>boş bırakın</strong>.
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">İlk Basınç (P₁)</label>
+            <input type="number" id="p1" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-cyan-500" placeholder="atm">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">İlk Hacim (V₁)</label>
+            <input type="number" id="v1" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-cyan-500" placeholder="L">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Son Basınç (P₂)</label>
+            <input type="number" id="p2" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-cyan-500" placeholder="atm">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Son Hacim (V₂)</label>
+            <input type="number" id="v2" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-cyan-500" placeholder="L">
+        </div>
+    </div>
+
+    <button onclick="calculateBoyle()" class="w-full bg-cyan-600 text-white font-semibold py-3 rounded-lg hover:bg-cyan-700 transition shadow-lg shadow-cyan-200 mt-2">
+        Hesapla
+    </button>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>Boyle yasası, sabit sıcaklıkta bir gazın basıncı ile hacminin ters orantılı olduğunu ifade eder.</p>
+<div class="bg-gray-100 p-4 rounded-lg my-4 font-mono text-center text-lg font-bold text-cyan-600">
+    P₁ × V₁ = P₂ × V₂
+</div>
+<p class="text-sm">Birimler her iki taraf için de tutarlı olmalıdır (örn: her iki basınç da atm ise sorun yoktur).</p>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+    function calculateBoyle() {
+        const p1 = parseFloat(document.getElementById('p1').value);
+        const v1 = parseFloat(document.getElementById('v1').value);
+        const p2 = parseFloat(document.getElementById('p2').value);
+        const v2 = parseFloat(document.getElementById('v2').value);
+
+        const inputs = [isNaN(p1), isNaN(v1), isNaN(p2), isNaN(v2)];
+        const missingCount = inputs.filter(x => x).length;
+
+        if (missingCount !== 1) {
+            alert("Lütfen hesaplanacak değer dışındaki 3 alanı doldurun.");
+            return;
+        }
+
+        let result = 0;
+        let unit = '';
+        let targetId = '';
+
+        if (isNaN(p1)) {
+            result = (p2 * v2) / v1;
+            unit = 'Basınç';
+            targetId = 'p1';
+        } else if (isNaN(v1)) {
+            result = (p2 * v2) / p1;
+            unit = 'Hacim';
+            targetId = 'v1';
+        } else if (isNaN(p2)) {
+            result = (p1 * v1) / v2;
+            unit = 'Basınç';
+            targetId = 'p2';
+        } else if (isNaN(v2)) {
+            result = (p1 * v1) / p2;
+            unit = 'Hacim';
+            targetId = 'v2';
+        }
+
+        document.getElementById(targetId).value = result.toFixed(4);
+        document.getElementById(targetId).classList.add('bg-cyan-50');
+        showResult(result.toFixed(4), unit);
+    }
+</script>
+{% endblock %}

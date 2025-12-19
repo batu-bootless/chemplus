@@ -1,0 +1,79 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}pH Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}pH Hesaplayıcı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-droplet"></i>{% endblock %}
+{% block header_title %}pH Hesaplayıcı{% endblock %}
+{% block header_desc %}Asitlik ve bazlık değerlerini hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-6">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">H+ İyon Konsantrasyonu (mol/L)</label>
+        <input type="number" id="h-conc" step="any" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Örn: 0.001 veya 1e-3">
+        <p class="text-xs text-gray-500 mt-2">Bilimsel gösterim kullanabilirsiniz (örn: 1e-7).</p>
+    </div>
+
+    <button onclick="calculatePH()" class="w-full bg-teal-600 text-white font-semibold py-3 rounded-lg hover:bg-teal-700 transition shadow-lg shadow-teal-200">
+        Hesapla
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_results %}
+<div class="mt-6 pt-6 border-t grid grid-cols-2 gap-4 text-center">
+    <div>
+        <div class="text-gray-500 text-sm">pOH</div>
+        <div id="poh-result" class="text-xl font-bold text-gray-800">---</div>
+    </div>
+    <div>
+        <div class="text-gray-500 text-sm">Durum</div>
+        <div id="type-result" class="text-xl font-bold text-gray-800">---</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>pH, bir çözeltinin asitlik veya bazlık derecesini gösteren logaritmik bir ölçüdür.</p>
+<div class="bg-gray-100 p-4 rounded-lg my-4 font-mono text-center">
+    pH = -log[H+]
+</div>
+<p>Oda sıcaklığında (25°C): pH + pOH = 14</p>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+    function calculatePH() {
+        const hConc = parseFloat(document.getElementById('h-conc').value);
+        
+        if (!hConc || hConc <= 0) {
+            alert("Lütfen geçerli bir pozitif konsantrasyon giriniz.");
+            return;
+        }
+
+        const ph = -Math.log10(hConc);
+        const poh = 14 - ph;
+        
+        let type = "Nötr";
+        if (ph < 7) type = "Asidik";
+        if (ph > 7) type = "Bazik";
+
+        showResult(ph.toFixed(2), '');
+        
+        document.getElementById('poh-result').textContent = poh.toFixed(2);
+        document.getElementById('type-result').textContent = type;
+        
+        // Color code the result
+        const resultVal = document.getElementById('result-value');
+        if (ph < 7) resultVal.className = "text-4xl font-bold text-red-500";
+        else if (ph > 7) resultVal.className = "text-4xl font-bold text-blue-500";
+        else resultVal.className = "text-4xl font-bold text-green-500";
+        
+        window.calcChartData = { type: 'bar', data: [
+            { label: 'pH', value: +ph.toFixed(2) },
+            { label: 'pOH', value: +poh.toFixed(2) }
+        ]};
+    }
+</script>
+{% endblock %}

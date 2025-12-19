@@ -1,0 +1,70 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block title %}Yarı Ömür Hesaplayıcı - ChemPlus{% endblock %}
+{% block tool_name %}Yarı Ömür Hesaplayıcı{% endblock %}
+
+{% block tool_icon %}<i class="fa-solid fa-hourglass-half"></i>{% endblock %}
+{% block header_title %}Yarı Ömür Hesaplayıcı{% endblock %}
+{% block header_desc %}Radyoaktif bozunma sonrası kalan miktarı hesaplayın.{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Başlangıç Miktarı (N₀)</label>
+        <input type="number" id="initial" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Örn: 100">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Yarı Ömür (t½)</label>
+            <input type="number" id="halflife" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Örn: 5730">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Geçen Süre (t)</label>
+            <input type="number" id="time" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Örn: 2000">
+        </div>
+    </div>
+    
+    <p class="text-xs text-gray-500">Süre birimleri aynı olmalıdır (örn: ikisi de yıl).</p>
+
+    <button onclick="calculateHalfLife()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 mt-2">
+        Hesapla
+    </button>
+</div>
+{% endblock %}
+
+{% block explanation %}
+<p>Yarı ömür, radyoaktif bir maddenin miktarının yarıya inmesi için gereken süredir.</p>
+<div class="bg-gray-100 p-4 rounded-lg my-4 font-mono text-center text-lg font-bold text-indigo-600">
+    N(t) = N₀ × (1/2)^(t / t½)
+</div>
+<ul class="list-disc pl-5 space-y-2 text-sm">
+    <li><strong>N(t):</strong> Kalan miktar</li>
+    <li><strong>N₀:</strong> Başlangıç miktarı</li>
+    <li><strong>t:</strong> Geçen süre</li>
+    <li><strong>t½:</strong> Yarı ömür süresi</li>
+</ul>
+{% endblock %}
+
+{% block specific_js %}
+<script>
+    function calculateHalfLife() {
+        const N0 = parseFloat(document.getElementById('initial').value);
+        const t_half = parseFloat(document.getElementById('halflife').value);
+        const t = parseFloat(document.getElementById('time').value);
+
+        if (isNaN(N0) || isNaN(t_half) || isNaN(t)) {
+            alert("Lütfen tüm alanları doldurunuz.");
+            return;
+        }
+
+        if (t_half <= 0) {
+            alert("Yarı ömür 0'dan büyük olmalıdır.");
+            return;
+        }
+
+        const result = N0 * Math.pow(0.5, t / t_half);
+        showResult(result.toExponential(3), 'Kalan');
+    }
+</script>
+{% endblock %}

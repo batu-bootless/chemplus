@@ -1,0 +1,101 @@
+{% extends 'calculators/calculator_base.html' %}
+
+{% block tool_name %}Etkin Nükleer Yük (Zₑff){% endblock %}
+{% block tool_icon %}<i class="fa-solid fa-circle-nodes"></i>{% endblock %}
+{% block header_title %}Etkin Nükleer Yük{% endblock %}
+{% block header_desc %}Slater kuralları ile yaklaşık Zₑff hesabı{% endblock %}
+
+{% block input_form %}
+<div class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Atom Numarası (Z)</label>
+        <input type="number" id="z" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 17" step="1" min="1" max="86">
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hedef Kabuk (n)</label>
+            <input type="number" id="n_shell" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: 3" step="1" min="1" max="7">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Alt Kabuk</label>
+            <select id="subshell" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="sp">s/p</option>
+                <option value="df">d/f</option>
+            </select>
+        </div>
+    </div>
+    <button onclick="calculateZeff()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-200">Hesapla</button>
+    <p class="text-xs text-gray-500 mt-2">Yaklaşım: Slater kuralları (ns/np için: 0.35, 0.85, 1.00; nd/nf için: 0.35, 1.00)</p>
+{% endblock %}
+
+{% block extra_results %}
+<div id="extra-results" class="mt-4"></div>
+{% endblock %}
+
+{% block info_title %}Not{% endblock %}
+{% block info_body %}
+Sonuç yaklaşık bir değerdir; ayrıntılı istisnalar ve yarı-dolu kabuk anomalileri dikkate alınmamıştır.
+{% endblock %}
+
+{% block specific_js %}
+<script>
+function buildConfig(Z){
+  const order = [
+    ['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6],
+    ['4s', 2], ['3d', 10], ['4p', 6], ['5s', 2], ['4d', 10],
+    ['5p', 6], ['6s', 2], ['4f', 14], ['5d', 10], ['6p', 6],
+    ['7s', 2], ['5f', 14], ['6d', 10], ['7p', 6]
+  ];
+  let left = Z;
+  const shellTotals = {};
+  for (const [sub, cap] of order) {
+    if (left <= 0) break;
+    const use = Math.min(cap, left);
+    const n = parseInt(sub[0], 10);
+    shellTotals[n] = (shellTotals[n] || 0) + use;
+    left -= use;
+  }
+  return shellTotals;
+}
+function calculateZeff(){
+  const Z = parseInt(document.getElementById('z').value);
+  const n = parseInt(document.getElementById('n_shell').value);
+  const kind = document.getElementById('subshell').value;
+  if (!Z || !n) return;
+  const shells = buildConfig(Z);
+  const same = (shells[n] || 0) - 1;
+  let S = 0;
+  if (kind === 'sp'){
+    const sameCoeff = (n === 1) ? 0.30 : 0.35;
+    const n1 = shells[n-1] || 0;
+    let lower = 0;
+    for (const k in shells){ const kn = parseInt(k); if (kn < n-1) lower += shells[k]; }
+    S = sameCoeff * Math.max(0, same) + 0.85 * n1 + 1.00 * lower;
+  } else {
+    const sameCoeff = 0.35;
+    let lower = 0;
+    for (const k in shells){ const kn = parseInt(k); if (kn < n) lower += shells[k]; }
+    S = sameCoeff * Math.max(0, same) + 1.00 * lower;
+  }
+  const Zeff = Z - S;
+  showResult(Zeff.toFixed(3), '');
+  window.calcChartData = { type: 'bar', data: [
+    { label: 'Z', value: Z },
+    { label: 'S', value: +S.toFixed(3) },
+    { label: 'Zₑff', value: +Zeff.toFixed(3) }
+  ]};
+  const extra = document.getElementById('extra-results');
+  const n1 = shells[n-1] || 0;
+  let lower = 0;
+  for (const k in shells){ const kn = parseInt(k); if (kn < (kind==='sp' ? n-1 : n)) lower += shells[k]; }
+  extra.innerHTML = `
+    <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+      <p class="text-sm text-gray-700">Aynı kabuk diğer e⁻: <span class="font-bold">${Math.max(0, same)}</span></p>
+      <p class="text-sm text-gray-700">n-1 kabuk e⁻: <span class="font-bold">${n1}</span></p>
+      <p class="text-sm text-gray-700">Daha düşük kabuk e⁻: <span class="font-bold">${lower}</span></p>
+    </div>
+  `;
+}
+</script>
+{% endblock %}
+
